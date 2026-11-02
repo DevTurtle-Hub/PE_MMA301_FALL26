@@ -1,0 +1,29 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /books/{bookId} {
+      // 1. Phải đăng nhập
+      // 2. Chỉ đọc, sửa, xóa dữ liệu của chính mình
+      allow read, delete: if request.auth != null && resource.data.userId == request.auth.uid;
+      
+      // 3. Quy tắc thêm mới & cập nhật
+      allow create: if request.auth != null 
+        && request.resource.data.userId == request.auth.uid
+        && request.resource.data.title is string 
+        && request.resource.data.title.trim().size() > 0 
+        && request.resource.data.title.size() <= 100
+        && request.resource.data.author is string 
+        && request.resource.data.author.trim().size() > 0 
+        && request.resource.data.author.size() <= 60
+        && request.resource.data.genre in ['Fiction', 'Non-Fiction', 'Academic', 'Other']
+        && request.resource.data.status in ['To Read', 'Reading', 'Finished']
+        && (!('rating' in request.resource.data) || (request.resource.data.rating is int && request.resource.data.rating >= 0 && request.resource.data.rating <= 5))
+        && (!('notes' in request.resource.data) || (request.resource.data.notes is string && request.resource.data.notes.size() <= 300));
+
+      allow update: if request.auth != null 
+        && resource.data.userId == request.auth.uid
+        && request.resource.data.userId == request.auth.uid;
+    }
+  }
+}
+
