@@ -1,7 +1,7 @@
-export type Genre = 'Fiction' | 'Non-Fiction' | 'Academic' | 'Other';
+export type Genre = string;
 export const GENRES: Genre[] = ['Fiction', 'Non-Fiction', 'Academic', 'Other'];
 
-export type Status = 'To Read' | 'Reading' | 'Finished';
+export type Status = string;
 export const STATUSES: Status[] = ['To Read', 'Reading', 'Finished'];
 
 export interface Book {
@@ -9,8 +9,8 @@ export interface Book {
   userId: string;
   title: string;
   author: string;
-  genre: Genre;
-  status: Status;
+  genre: string;
+  status: string;
   rating?: number; // 0..5
   favorite?: boolean; // false by default
   notes?: string;  // <= 300 characters
@@ -20,9 +20,13 @@ export interface Book {
 export interface BookFormData {
   title: string;
   author: string;
-  genre: Genre;
-  status: Status;
+  genre: string;
+  status: string;
   rating?: number;
   favorite?: boolean;
   notes?: string;
 }
+
+// Generic Aliases for fast multi-topic exams
+export type Item = Book;
+export type ItemFormData = BookFormData;
