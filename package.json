@@ -29,6 +29,7 @@
     "firebase": "firebase",
     "deploy:rules": "firebase deploy --only firestore:rules",
     "build:apk": "eas build -p android --profile preview",
+    "sync": "python scripts/sync_exam.py",
     "lint": "expo lint"
   },
   "private": true
