@@ -6,7 +6,6 @@ import {
   ScrollView,
   KeyboardAvoidingView,
   Platform,
-  Alert,
   TouchableOpacity,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -19,31 +18,35 @@ const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export const LoginScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp<'Login'>>();
-  const { login, loading, error, clearError } = useAuth();
+  const { login, loading, error: contextError, clearError } = useAuth();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [authError, setAuthError] = useState<string | null>(null);
 
-  // Validations
+  // Field validations (dynamic real-time calculation)
   const trimmedEmail = email.trim();
   const emailError = !trimmedEmail
-    ? 'Email is required'
+    ? 'Email is required.'
     : !EMAIL_REGEX.test(trimmedEmail)
-    ? 'Invalid email format (e.g. user@example.com)'
+    ? 'Invalid email format (e.g. user@example.com).'
     : '';
 
   const passwordError = !password
-    ? 'Password is required'
+    ? 'Password is required.'
     : password.length < 6
-    ? 'Password must be at least 6 characters'
+    ? 'Password must be at least 6 characters.'
     : '';
 
   const isFormValid = !emailError && !passwordError;
 
   const handleLogin = async () => {
     setSubmitted(true);
+    setAuthError(null);
+    if (contextError) clearError();
+
     if (!isFormValid) {
       return;
     }
@@ -51,9 +54,19 @@ export const LoginScreen: React.FC = () => {
     setSubmitting(true);
     try {
       await login(trimmedEmail, password);
-      // Auth listener automatically switches stacks
+      // Navigation to 'List' screen is handled automatically by the auth state listener in AppNavigator
     } catch (err: any) {
-      Alert.alert('Sign In Failed', err.message || 'Please check your credentials.');
+      let message = err.message || 'Login failed.';
+      if (
+        err.code === 'auth/wrong-password' ||
+        err.code === 'auth/user-not-found' ||
+        err.code === 'auth/invalid-credential'
+      ) {
+        message = 'Invalid email or password.';
+      } else if (err.code === 'auth/too-many-requests') {
+        message = 'Too many attempts. Please try again later.';
+      }
+      setAuthError(message);
     } finally {
       setSubmitting(false);
     }
@@ -70,30 +83,44 @@ export const LoginScreen: React.FC = () => {
             <Text style={styles.title}>Welcome Back</Text>
             <Text style={styles.subtitle}>Sign in with your email and password</Text>
 
-            {error ? <Text style={styles.apiErrorText}>{error}</Text> : null}
+            {/* Requirement: "Bị lỗi từ Firebase (sai pass, trùng email): hiển thị ở error-auth" */}
+            {authError || contextError ? (
+              <View testID="error-auth" accessibilityLabel="error-auth" style={styles.errorAuthBox}>
+                <Text style={styles.errorAuthText}>{authError || contextError}</Text>
+              </View>
+            ) : null}
 
+            {/* Input Email - Tắt validate mặc định của hệ thống */}
             <Input
-              label="Email Address"
+              label="Email"
               placeholder="name@example.com"
               keyboardType="email-address"
               autoCapitalize="none"
+              autoCorrect={false}
+              spellCheck={false}
               value={email}
               onChangeText={(val) => {
                 setEmail(val);
-                if (error) clearError();
+                setAuthError(null);
+                if (contextError) clearError();
               }}
               error={emailError}
               showError={submitted}
             />
 
+            {/* Input Password - Tắt validate mặc định của hệ thống */}
             <Input
               label="Password"
               placeholder="••••••••"
               secureTextEntry
+              autoCapitalize="none"
+              autoCorrect={false}
+              spellCheck={false}
               value={password}
               onChangeText={(val) => {
                 setPassword(val);
-                if (error) clearError();
+                setAuthError(null);
+                if (contextError) clearError();
               }}
               error={passwordError}
               showError={submitted}
@@ -148,14 +175,19 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: 20,
   },
-  apiErrorText: {
-    color: '#DC2626',
-    backgroundColor: '#FEE2E2',
-    padding: 10,
+  errorAuthBox: {
+    backgroundColor: '#FDE8E8',
+    borderColor: '#F98080',
+    borderWidth: 1,
+    padding: 12,
     borderRadius: 8,
     marginBottom: 16,
-    textAlign: 'center',
+  },
+  errorAuthText: {
+    color: '#9B1C1C',
+    fontWeight: '600',
     fontSize: 13,
+    textAlign: 'center',
   },
   submitBtn: {
     marginTop: 8,
@@ -175,4 +207,3 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
 });
-

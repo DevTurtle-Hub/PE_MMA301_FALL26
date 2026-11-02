@@ -17,6 +17,8 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 export const AppNavigator: React.FC = () => {
   const { user, loading } = useAuth();
 
+  // Requirement: "Đã đăng nhập -> Chuyển thẳng vào màn hình List (không được chớp/flash màn hình Home)"
+  // While Firebase is restoring auth state from AsyncStorage, show loading indicator.
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
@@ -25,48 +27,43 @@ export const AppNavigator: React.FC = () => {
     );
   }
 
+  // Requirement: "Chưa đăng nhập -> Vào màn hình Home"
+  if (user == null) {
+    return (
+      <Stack.Navigator
+        screenOptions={{
+          headerShown: false,
+          animation: 'fade',
+        }}
+      >
+        <Stack.Screen name="Home" component={HomeScreen} />
+        <Stack.Screen
+          name="Login"
+          component={LoginScreen}
+          options={{ headerShown: true, title: 'Sign In' }}
+        />
+        <Stack.Screen
+          name="Register"
+          component={RegisterScreen}
+          options={{ headerShown: true, title: 'Sign Up' }}
+        />
+      </Stack.Navigator>
+    );
+  }
+
+  // Requirement: "Đã đăng nhập -> Chuyển thẳng vào màn hình List", "Bấm vào 1 sách -> Chuyển sang màn hình Detail"
   return (
-    <Stack.Navigator
-      screenOptions={{
-        headerShown: false,
-        animation: 'fade',
-      }}
-    >
-      {user == null ? (
-        // Unauthenticated Stack
-        <Stack.Group>
-          <Stack.Screen name="Home" component={HomeScreen} />
-          <Stack.Screen
-            name="Login"
-            component={LoginScreen}
-            options={{ headerShown: true, title: 'Sign In' }}
-          />
-          <Stack.Screen
-            name="Register"
-            component={RegisterScreen}
-            options={{ headerShown: true, title: 'Sign Up' }}
-          />
-        </Stack.Group>
-      ) : (
-        // Authenticated Stack
-        <Stack.Group>
-          <Stack.Screen name="List">
-            {() => (
-              <BookProvider>
-                <ListScreen />
-              </BookProvider>
-            )}
-          </Stack.Screen>
-          <Stack.Screen name="Detail">
-            {() => (
-              <BookProvider>
-                <DetailScreen />
-              </BookProvider>
-            )}
-          </Stack.Screen>
-        </Stack.Group>
-      )}
-    </Stack.Navigator>
+    <BookProvider>
+      <Stack.Navigator
+        screenOptions={{
+          headerShown: false,
+          animation: 'fade',
+        }}
+      >
+        <Stack.Screen name="List" component={ListScreen} />
+        <Stack.Screen name="Detail" component={DetailScreen} />
+      </Stack.Navigator>
+    </BookProvider>
   );
 };
 
@@ -78,4 +75,3 @@ const styles = StyleSheet.create({
     backgroundColor: '#F9FAFB',
   },
 });
-

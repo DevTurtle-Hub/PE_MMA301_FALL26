@@ -4,13 +4,14 @@ import {
   query,
   where,
   onSnapshot,
-  addDoc,
+  setDoc,
+  getDoc,
   updateDoc,
   deleteDoc,
   doc,
   serverTimestamp,
 } from 'firebase/firestore';
-import { db } from '../config/firebase';
+import { db } from '../config/firebaseConfig';
 import { Book, BookFormData } from '../types';
 import { useAuth } from './AuthContext';
 
@@ -59,7 +60,9 @@ export const BookProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     );
 
-    return () => unsubscribe();
+    return () => {
+      unsubscribe();
+    };
   }, [user]);
 
   const validateBookData = (data: Partial<BookFormData>) => {
@@ -90,10 +93,39 @@ export const BookProvider: React.FC<{ children: React.ReactNode }> = ({ children
     validateBookData(data);
     setError(null);
 
+    const cleanTitle = data.title.trim();
+    const cleanAuthor = data.author.trim();
+
+    // "Bẫy" Trùng lặp (Duplicate Rule):
+    // Case-insensitive duplicate prevention:
+    // docId = `${title.trim().toLowerCase()}_${author.trim().toLowerCase()}`
+    const docId = `${cleanTitle.toLowerCase()}_${cleanAuthor.toLowerCase()}`.replace(/\//g, '_');
+
+    // 1. Client-side duplicate check
+    const isDuplicate = books.some(
+      (b) =>
+        b.title.trim().toLowerCase() === cleanTitle.toLowerCase() &&
+        b.author.trim().toLowerCase() === cleanAuthor.toLowerCase()
+    );
+    if (isDuplicate) {
+      const msg = `Duplicate entry: You already have "${cleanTitle}" by "${cleanAuthor}" in your library (case-insensitive).`;
+      setError(msg);
+      throw new Error(msg);
+    }
+
+    // 2. Server-side / Firestore check on the deterministic docId
+    const bookRef = doc(db, 'books', docId);
+    const existingSnap = await getDoc(bookRef);
+    if (existingSnap.exists()) {
+      const msg = `Duplicate entry: A book with this title and author already exists in Firestore.`;
+      setError(msg);
+      throw new Error(msg);
+    }
+
     const newBookPayload: Record<string, any> = {
       userId: user.uid,
-      title: data.title.trim(),
-      author: data.author.trim(),
+      title: cleanTitle,
+      author: cleanAuthor,
       genre: data.genre,
       status: data.status,
       createdAt: serverTimestamp(),
@@ -107,7 +139,7 @@ export const BookProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
 
     try {
-      await addDoc(collection(db, 'books'), newBookPayload);
+      await setDoc(bookRef, newBookPayload, { merge: false });
     } catch (err: any) {
       setError(err.message || 'Failed to add book');
       throw err;
@@ -118,6 +150,26 @@ export const BookProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (!user) throw new Error('You must be signed in to update a book');
     validateBookData(data);
     setError(null);
+
+    // If title or author is changed, check for duplicates with other books
+    if (data.title !== undefined || data.author !== undefined) {
+      const targetBook = books.find((b) => b.id === id);
+      const newTitle = (data.title !== undefined ? data.title : targetBook?.title || '').trim().toLowerCase();
+      const newAuthor = (data.author !== undefined ? data.author : targetBook?.author || '').trim().toLowerCase();
+
+      const duplicate = books.find(
+        (b) =>
+          b.id !== id &&
+          b.title.trim().toLowerCase() === newTitle &&
+          b.author.trim().toLowerCase() === newAuthor
+      );
+
+      if (duplicate) {
+        const msg = `Duplicate entry: Another book with this title and author already exists (case-insensitive).`;
+        setError(msg);
+        throw new Error(msg);
+      }
+    }
 
     const updatePayload: Record<string, any> = {
       userId: user.uid,
@@ -176,4 +228,3 @@ export const useBooks = (): BookContextType => {
   }
   return context;
 };
-
