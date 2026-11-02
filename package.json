@@ -28,6 +28,7 @@
     "web": "expo start --web",
     "firebase": "firebase",
     "deploy:rules": "firebase deploy --only firestore:rules",
+    "build:apk": "eas build -p android --profile preview",
     "lint": "expo lint"
   },
   "private": true

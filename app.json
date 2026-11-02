@@ -1,15 +1,17 @@
 {
   "expo": {
     "name": "PE_MMA301_FALL26",
-    "slug": "PE_MMA301_FALL26",
+    "slug": "pe_mma301_fall26",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
+    "owner": "quynv64",
     "ios": {
       "supportsTablet": true
     },
     "android": {
+      "package": "com.quynv64.pemma301fall26",
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/android-icon-foreground.png",

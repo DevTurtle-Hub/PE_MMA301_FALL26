@@ -63,7 +63,7 @@ def create_report(student_code="QE190042", full_name="Nguyen Van Quy", output_fi
         ("Student Code", student_code),
         ("Full Name", full_name),
         ("GitHub Repository URL", "https://github.com/DevTurtle-Hub/PE_MMA301_FALL26"),
-        ("Expo Project Link", "https://expo.dev/accounts/devturtle/projects/PE_MMA301_FALL26"),
+        ("Expo Project Link", "https://expo.dev/accounts/quynv64/projects/pe_mma301_fall26"),
         ("Firebase Project ID", "pemma301fall26"),
         ("Test account email", f"grader.{student_code.lower()}@example.com"),
         ("Test account password", "Test1234!"),

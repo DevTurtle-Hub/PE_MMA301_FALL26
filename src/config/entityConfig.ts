@@ -141,3 +141,4 @@ export const ENTITY_CONFIG: EntityConfig = {
     },
   ],
 };
+

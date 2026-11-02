@@ -217,3 +217,4 @@ if __name__ == "__main__":
             apply_topic(**cfg)
     else:
         apply_topic()
+
