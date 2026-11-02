@@ -6,8 +6,9 @@ import {
   TouchableOpacity,
   TextInput,
 } from 'react-native';
-import { BookFormData, GENRES, Genre, STATUSES, Status } from '../types';
+import { BookFormData, Genre, Status } from '../types';
 import { Card, Button, Input } from './ui';
+import { ENTITY_CONFIG } from '../config/entityConfig';
 
 interface BookFormProps {
   initialValues?: Partial<BookFormData>;
@@ -21,9 +22,11 @@ export const BookForm: React.FC<BookFormProps> = ({
   initialValues,
   onSubmit,
   onCancel,
-  submitButtonText = 'Add Book',
+  submitButtonText = `Add ${ENTITY_CONFIG.entitySingular}`,
   isEdit = false,
 }) => {
+  const cfg = ENTITY_CONFIG;
+
   const [title, setTitle] = useState(initialValues?.title || '');
   const [author, setAuthor] = useState(initialValues?.author || '');
   const [genre, setGenre] = useState<string>(initialValues?.genre || '');
@@ -38,40 +41,40 @@ export const BookForm: React.FC<BookFormProps> = ({
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [formError, setFormError] = useState<string | null>(null);
 
-  // Exact validation rules from exam document:
-  // Title: empty or spaces only / longer than 100
+  // Field 1 validation (Title)
   const trimmedTitle = title.trim();
   const titleError = !trimmedTitle
-    ? 'Title is required'
-    : trimmedTitle.length > 100
-    ? 'Title must be at most 100 characters'
+    ? cfg.field1.requiredMessage
+    : trimmedTitle.length > cfg.field1.maxLength
+    ? cfg.field1.maxMessage
     : '';
 
-  // Author: empty or spaces only / longer than 60
+  // Field 2 validation (Author)
   const trimmedAuthor = author.trim();
   const authorError = !trimmedAuthor
-    ? 'Author is required'
-    : trimmedAuthor.length > 60
-    ? 'Author must be at most 60 characters'
+    ? cfg.field2.requiredMessage
+    : trimmedAuthor.length > cfg.field2.maxLength
+    ? cfg.field2.maxMessage
     : '';
 
-  // Genre: nothing chosen
-  const genreError = !genre || genre === 'Choose genre' ? 'Please choose a genre' : '';
+  // Category validation (Genre)
+  const genreError = !genre || genre === cfg.category.chooseLabel ? cfg.category.emptyMessage : '';
 
-  // Status: nothing chosen
-  const statusError = !status || status === 'Choose status' ? 'Please choose a status' : '';
+  // Status validation
+  const statusError = !status || status === cfg.status.chooseLabel ? cfg.status.emptyMessage : '';
 
-  // Rating: only if filled in: not a whole number from 0 to 5
+  // Numeric validation (Rating)
   let ratingError = '';
-  if (rating.trim() !== '') {
+  if (cfg.numeric && rating.trim() !== '') {
     const num = Number(rating.trim());
-    if (!Number.isInteger(num) || num < 0 || num > 5 || isNaN(num)) {
-      ratingError = 'Rating must be a whole number from 0 to 5';
+    if (!Number.isInteger(num) || num < cfg.numeric.min || num > cfg.numeric.max || isNaN(num)) {
+      ratingError = cfg.numeric.errorMessage;
     }
   }
 
-  // Notes: longer than 300
-  const notesError = notes.length > 300 ? 'Notes must be at most 300 characters' : '';
+  // Notes validation
+  const notesError =
+    cfg.notes && notes.length > cfg.notes.maxLength ? cfg.notes.maxMessage : '';
 
   const isFormValid =
     !titleError && !authorError && !genreError && !statusError && !ratingError && !notesError;
@@ -99,7 +102,6 @@ export const BookForm: React.FC<BookFormProps> = ({
       await onSubmit(payload);
 
       if (!isEdit) {
-        // Requirement: "the form is cleared, and book-success shows Book added"
         setTitle('');
         setAuthor('');
         setGenre('');
@@ -107,37 +109,39 @@ export const BookForm: React.FC<BookFormProps> = ({
         setRating('');
         setNotes('');
         setSubmitted(false);
-        setSuccessMessage('Book added');
+        setSuccessMessage(cfg.formSuccessText);
       }
     } catch (err: any) {
-      setFormError(err.message || 'Failed to save book');
+      setFormError(err.message || `Failed to save ${cfg.entitySingular}`);
     } finally {
       setSubmitting(false);
     }
   };
 
   return (
-    <Card testID="book-form" accessibilityLabel="book-form" style={styles.card}>
-      <Text style={styles.formHeaderTitle}>{isEdit ? 'Edit Book' : 'Add a Book'}</Text>
+    <Card testID={cfg.formTestId} accessibilityLabel={cfg.formTestId} style={styles.card}>
+      <Text style={styles.formHeaderTitle}>
+        {isEdit ? `Edit ${cfg.entitySingular}` : `Add a ${cfg.entitySingular}`}
+      </Text>
 
-      {/* Requirement: "and book-success shows Book added" */}
+      {/* Success Banner */}
       {successMessage ? (
-        <View testID="book-success" accessibilityLabel="book-success" style={styles.successBox}>
+        <View testID={cfg.formSuccessTestId} accessibilityLabel={cfg.formSuccessTestId} style={styles.successBox}>
           <Text style={styles.successText}>{successMessage}</Text>
         </View>
       ) : null}
 
-      {/* Requirement: "If Firestore returns an error ... show it in error-book" */}
+      {/* Error Banner */}
       {formError ? (
-        <View testID="error-book" accessibilityLabel="error-book" style={styles.errorBox}>
+        <View testID={cfg.errorFormTestId} accessibilityLabel={cfg.errorFormTestId} style={styles.errorBox}>
           <Text style={styles.errorText}>{formError}</Text>
         </View>
       ) : null}
 
-      {/* Title */}
+      {/* Field 1 */}
       <Input
-        label="Title *"
-        placeholder="Enter title"
+        label={`${cfg.field1.label} *`}
+        placeholder={cfg.field1.placeholder}
         value={title}
         autoCapitalize="none"
         autoCorrect={false}
@@ -148,13 +152,13 @@ export const BookForm: React.FC<BookFormProps> = ({
         }}
         error={titleError}
         showError={submitted}
-        maxLength={110}
+        maxLength={cfg.field1.maxLength + 10}
       />
 
-      {/* Author */}
+      {/* Field 2 */}
       <Input
-        label="Author *"
-        placeholder="Enter author"
+        label={`${cfg.field2.label} *`}
+        placeholder={cfg.field2.placeholder}
         value={author}
         autoCapitalize="none"
         autoCorrect={false}
@@ -165,25 +169,25 @@ export const BookForm: React.FC<BookFormProps> = ({
         }}
         error={authorError}
         showError={submitted}
-        maxLength={70}
+        maxLength={cfg.field2.maxLength + 10}
       />
 
-      {/* Genre Picker (first choice "Choose genre", then Fiction, Non-Fiction, Academic, Other) */}
+      {/* Category Picker */}
       <View style={styles.fieldContainer}>
-        <Text style={styles.label}>Genre *</Text>
+        <Text style={styles.label}>{cfg.category.label} *</Text>
         <View style={styles.optionsRow}>
-          {['Choose genre', ...GENRES].map((g) => {
-            const isSelected = genre === g || (!genre && g === 'Choose genre');
+          {[cfg.category.chooseLabel, ...cfg.category.options].map((g) => {
+            const isSelected = genre === g || (!genre && g === cfg.category.chooseLabel);
             return (
               <TouchableOpacity
                 key={g}
                 style={[
                   styles.optionChip,
                   isSelected && styles.optionChipSelected,
-                  g === 'Choose genre' && styles.optionChipEmpty,
+                  g === cfg.category.chooseLabel && styles.optionChipEmpty,
                 ]}
                 onPress={() => {
-                  setGenre(g === 'Choose genre' ? '' : g);
+                  setGenre(g === cfg.category.chooseLabel ? '' : g);
                   setFormError(null);
                   setSuccessMessage(null);
                 }}
@@ -192,7 +196,7 @@ export const BookForm: React.FC<BookFormProps> = ({
                   style={[
                     styles.optionText,
                     isSelected && styles.optionTextSelected,
-                    g === 'Choose genre' && styles.optionTextEmpty,
+                    g === cfg.category.chooseLabel && styles.optionTextEmpty,
                   ]}
                 >
                   {g}
@@ -204,22 +208,22 @@ export const BookForm: React.FC<BookFormProps> = ({
         {submitted && genreError ? <Text style={styles.inlineError}>{genreError}</Text> : null}
       </View>
 
-      {/* Status Picker (first choice "Choose status", then To Read, Reading, Finished) */}
+      {/* Status Picker */}
       <View style={styles.fieldContainer}>
-        <Text style={styles.label}>Status *</Text>
+        <Text style={styles.label}>{cfg.status.label} *</Text>
         <View style={styles.optionsRow}>
-          {['Choose status', ...STATUSES].map((s) => {
-            const isSelected = status === s || (!status && s === 'Choose status');
+          {[cfg.status.chooseLabel, ...cfg.status.options].map((s) => {
+            const isSelected = status === s || (!status && s === cfg.status.chooseLabel);
             return (
               <TouchableOpacity
                 key={s}
                 style={[
                   styles.optionChip,
                   isSelected && styles.optionChipSelected,
-                  s === 'Choose status' && styles.optionChipEmpty,
+                  s === cfg.status.chooseLabel && styles.optionChipEmpty,
                 ]}
                 onPress={() => {
-                  setStatus(s === 'Choose status' ? '' : s);
+                  setStatus(s === cfg.status.chooseLabel ? '' : s);
                   setFormError(null);
                   setSuccessMessage(null);
                 }}
@@ -228,7 +232,7 @@ export const BookForm: React.FC<BookFormProps> = ({
                   style={[
                     styles.optionText,
                     isSelected && styles.optionTextSelected,
-                    s === 'Choose status' && styles.optionTextEmpty,
+                    s === cfg.status.chooseLabel && styles.optionTextEmpty,
                   ]}
                 >
                   {s}
@@ -240,47 +244,53 @@ export const BookForm: React.FC<BookFormProps> = ({
         {submitted && statusError ? <Text style={styles.inlineError}>{statusError}</Text> : null}
       </View>
 
-      {/* Rating (optional 0-5) */}
-      <Input
-        label="Rating (0 - 5, optional)"
-        placeholder="e.g. 5"
-        keyboardType="numeric"
-        value={rating}
-        onChangeText={(val) => {
-          setRating(val);
-          setFormError(null);
-          setSuccessMessage(null);
-        }}
-        error={ratingError}
-        showError={submitted}
-      />
-
-      {/* Notes (optional, max 300) */}
-      <View style={styles.fieldContainer}>
-        <Text style={styles.label}>Notes (max 300 characters, optional)</Text>
-        <TextInput
-          style={[styles.textArea, submitted && !!notesError && styles.textAreaError]}
-          placeholder="Personal notes..."
-          placeholderTextColor="#9CA3AF"
-          multiline
-          numberOfLines={3}
-          value={notes}
+      {/* Numeric Field (Rating/Priority) */}
+      {cfg.numeric ? (
+        <Input
+          label={cfg.numeric.label}
+          placeholder={`e.g. ${cfg.numeric.max}`}
+          keyboardType="numeric"
+          value={rating}
           onChangeText={(val) => {
-            setNotes(val);
+            setRating(val);
             setFormError(null);
             setSuccessMessage(null);
           }}
-          maxLength={350}
+          error={ratingError}
+          showError={submitted}
         />
-        <View style={styles.notesFooter}>
-          {submitted && notesError ? (
-            <Text style={styles.inlineError}>{notesError}</Text>
-          ) : (
-            <View style={{ flex: 1 }} />
-          )}
-          <Text style={styles.charCount}>{notes.length}/300</Text>
+      ) : null}
+
+      {/* Notes Field */}
+      {cfg.notes ? (
+        <View style={styles.fieldContainer}>
+          <Text style={styles.label}>{cfg.notes.label}</Text>
+          <TextInput
+            style={[styles.textArea, submitted && !!notesError && styles.textAreaError]}
+            placeholder="Personal notes..."
+            placeholderTextColor="#9CA3AF"
+            multiline
+            numberOfLines={3}
+            value={notes}
+            onChangeText={(val) => {
+              setNotes(val);
+              setFormError(null);
+              setSuccessMessage(null);
+            }}
+            maxLength={cfg.notes.maxLength + 50}
+          />
+          <View style={styles.notesFooter}>
+            {submitted && notesError ? (
+              <Text style={styles.inlineError}>{notesError}</Text>
+            ) : (
+              <View style={{ flex: 1 }} />
+            )}
+            <Text style={styles.charCount}>
+              {notes.length}/{cfg.notes.maxLength}
+            </Text>
+          </View>
         </View>
-      </View>
+      ) : null}
 
       <View style={styles.buttonRow}>
         {onCancel ? (

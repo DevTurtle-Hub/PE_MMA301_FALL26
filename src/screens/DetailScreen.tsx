@@ -14,8 +14,10 @@ import { useBooks } from '../context/BookContext';
 import { Card, Badge, Button, BadgeVariant } from '../components/ui';
 import { BookForm } from '../components/BookForm';
 import { BookFormData } from '../types';
+import { ENTITY_CONFIG } from '../config/entityConfig';
 
 export const DetailScreen: React.FC = () => {
+  const cfg = ENTITY_CONFIG;
   const route = useRoute<ScreenRouteProp<'Detail'>>();
   const navigation = useNavigation<NavigationProp<'Detail'>>();
   const { bookId } = route.params;
@@ -32,14 +34,14 @@ export const DetailScreen: React.FC = () => {
       case 'Reading':
         return { label: 'Reading', variant: 'blue' };
       default:
-        return { label: 'To Read', variant: 'yellow' };
+        return { label: status, variant: 'yellow' };
     }
   };
 
   const handleDelete = () => {
     if (!book) return;
     Alert.alert(
-      'Delete Book',
+      `Delete ${cfg.entitySingular}`,
       `Are you sure you want to delete "${book.title}"?`,
       [
         { text: 'Cancel', style: 'cancel' },
@@ -51,7 +53,7 @@ export const DetailScreen: React.FC = () => {
               await deleteBook(bookId);
               navigation.goBack();
             } catch (err: any) {
-              Alert.alert('Error', err.message || 'Failed to delete book');
+              Alert.alert('Error', err.message || `Failed to delete ${cfg.entitySingular}`);
             }
           },
         },
@@ -61,14 +63,14 @@ export const DetailScreen: React.FC = () => {
 
   const handleEditSubmit = async (data: BookFormData) => {
     await updateBook(bookId, data);
-    setIsEditing(false); // Requirement: "Save updates the book in Firestore and returns to view mode"
+    setIsEditing(false);
   };
 
   if (!book) {
     return (
       <SafeAreaView style={styles.safeArea}>
         <View style={styles.centerContainer}>
-          <Text style={styles.notFoundText}>Book not found or deleted.</Text>
+          <Text style={styles.notFoundText}>{cfg.entitySingular} not found or deleted.</Text>
           <Button
             title="Go Back"
             onPress={() => navigation.goBack()}
@@ -89,13 +91,14 @@ export const DetailScreen: React.FC = () => {
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
           <Text style={styles.backBtnText}>← Back</Text>
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>{isEditing ? 'Edit Book' : 'Book Details'}</Text>
+        <Text style={styles.headerTitle}>
+          {isEditing ? `Edit ${cfg.entitySingular}` : `${cfg.entitySingular} Details`}
+        </Text>
         <View style={{ width: 50 }} />
       </View>
 
       <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
         {isEditing ? (
-          // Requirement: "An Edit action switches the same fields into editable inputs with Save and Cancel buttons"
           <BookForm
             initialValues={{
               title: book.title,
@@ -111,7 +114,6 @@ export const DetailScreen: React.FC = () => {
             isEdit={true}
           />
         ) : (
-          // View Mode: title, author, genre, status, rating, notes and favorite toggle
           <>
             <Card style={styles.mainCard}>
               <View style={styles.titleRow}>
@@ -137,21 +139,23 @@ export const DetailScreen: React.FC = () => {
               <View style={styles.divider} />
 
               <View style={styles.detailRow}>
-                <Text style={styles.label}>Genre:</Text>
+                <Text style={styles.label}>{cfg.category.label}:</Text>
                 <Text style={styles.value}>{book.genre}</Text>
               </View>
 
               <View style={styles.detailRow}>
-                <Text style={styles.label}>Status:</Text>
+                <Text style={styles.label}>{cfg.status.label}:</Text>
                 <Text style={styles.value}>{book.status}</Text>
               </View>
 
-              <View style={styles.detailRow}>
-                <Text style={styles.label}>Rating:</Text>
-                <Text style={styles.value}>
-                  {book.rating !== undefined ? `${'★'.repeat(book.rating)} (${book.rating}/5)` : 'Not rated yet'}
-                </Text>
-              </View>
+              {book.rating !== undefined ? (
+                <View style={styles.detailRow}>
+                  <Text style={styles.label}>Rating:</Text>
+                  <Text style={styles.value}>
+                    {'★'.repeat(book.rating)} ({book.rating}/5)
+                  </Text>
+                </View>
+              ) : null}
 
               <View style={styles.detailRow}>
                 <Text style={styles.label}>Favorite:</Text>
@@ -168,13 +172,13 @@ export const DetailScreen: React.FC = () => {
 
             <View style={styles.actionRow}>
               <Button
-                title="Edit Book"
+                title={`Edit ${cfg.entitySingular}`}
                 onPress={() => setIsEditing(true)}
                 variant="primary"
                 style={styles.actionBtn}
               />
               <Button
-                title="Delete Book"
+                title={`Delete ${cfg.entitySingular}`}
                 onPress={handleDelete}
                 variant="danger"
                 style={styles.actionBtn}

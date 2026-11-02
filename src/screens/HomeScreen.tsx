@@ -4,6 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { NavigationProp } from '../navigation/types';
 import { Button, Card } from '../components/ui';
+import { ENTITY_CONFIG } from '../config/entityConfig';
 
 export const HomeScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp<'Home'>>();
@@ -12,7 +13,7 @@ export const HomeScreen: React.FC = () => {
     <SafeAreaView style={styles.safeArea}>
       {/* Header with App Name and Login / Register buttons */}
       <View style={styles.header}>
-        <Text style={styles.headerAppName}>BookShelf</Text>
+        <Text style={styles.headerAppName}>{ENTITY_CONFIG.appName}</Text>
         <View style={styles.headerBtnGroup}>
           <Button
             title="Login"
@@ -32,36 +33,26 @@ export const HomeScreen: React.FC = () => {
       </View>
 
       <ScrollView contentContainerStyle={styles.container}>
-        {/* Title with exact testID="home-title" and text="BookShelf" */}
-        <Text testID="home-title" accessibilityLabel="home-title" style={styles.title}>
-          BookShelf
+        {/* Title with exact testID and text */}
+        <Text
+          testID={ENTITY_CONFIG.homeTitleTestId}
+          accessibilityLabel={ENTITY_CONFIG.homeTitleTestId}
+          style={styles.title}
+        >
+          {ENTITY_CONFIG.appName}
         </Text>
 
         <Text style={styles.description}>
-          Keep your own private list of books you own or want to read, sorted into reading statuses and genres, with favorite tracking.
+          A private collection management app to organize, sort, rate, and track your {ENTITY_CONFIG.entityPlural} effortlessly.
         </Text>
 
-        {/* At least three feature cards */}
-        <Card style={styles.featureCard}>
-          <Text style={styles.featureTitle}>📚 Track your books</Text>
-          <Text style={styles.featureDesc}>
-            Add and manage books in your private reading collection with custom notes and star ratings.
-          </Text>
-        </Card>
-
-        <Card style={styles.featureCard}>
-          <Text style={styles.featureTitle}>🏷️ Sort by status</Text>
-          <Text style={styles.featureDesc}>
-            Organize books seamlessly into To Read, Reading, and Finished states with instant filtering.
-          </Text>
-        </Card>
-
-        <Card style={styles.featureCard}>
-          <Text style={styles.featureTitle}>⭐ Rate your favorites</Text>
-          <Text style={styles.featureDesc}>
-            Star your favorite reads with one tap and filter favorite titles instantly.
-          </Text>
-        </Card>
+        {/* Feature cards from ENTITY_CONFIG */}
+        {ENTITY_CONFIG.featureCards.map((feat, index) => (
+          <Card key={index} style={styles.featureCard}>
+            <Text style={styles.featureTitle}>{feat.title}</Text>
+            <Text style={styles.featureDesc}>{feat.desc}</Text>
+          </Card>
+        ))}
 
         <View style={styles.actionSection}>
           <Button

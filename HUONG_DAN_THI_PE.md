@@ -74,3 +74,4 @@ Lệnh này sẽ tự động:
 3. Nén mã nguồn thành file `<StudentCode>.zip` chuẩn cấu trúc (chứa `package.json`, `firestore.rules`, `.env.example`, loại bỏ sạch sẽ `node_modules`, `.git`, `.expo`, `.env`).
 
 Bạn chỉ việc nộp thư mục này lên hệ thống thi cử là hoàn thành 100%!
+

@@ -1,18 +1,40 @@
 import os
+import json
+import re
 from docx import Document
 from docx.shared import Inches, Pt, RGBColor
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.enum.table import WD_TABLE_ALIGNMENT
 
+def get_entity_config():
+    # Read entityConfig.ts to extract appName and entityPlural
+    config_path = os.path.join(os.path.dirname(__file__), "..", "src", "config", "entityConfig.ts")
+    app_name = "BookShelf"
+    entity_plural = "books"
+    entity_singular = "book"
+
+    if os.path.exists(config_path):
+        with open(config_path, "r", encoding="utf-8") as f:
+            content = f.read()
+            m_app = re.search(r"appName:\s*['\"]([^'\"]+)['\"]", content)
+            if m_app: app_name = m_app.group(1)
+            m_plur = re.search(r"entityPlural:\s*['\"]([^'\"]+)['\"]", content)
+            if m_plur: entity_plural = m_plur.group(1)
+            m_sing = re.search(r"entitySingular:\s*['\"]([^'\"]+)['\"]", content)
+            if m_sing: entity_singular = m_sing.group(1)
+
+    return app_name, entity_singular, entity_plural
+
 def create_report(student_code="QE190042", full_name="Nguyen Van Quy", output_filename=None):
     if not output_filename:
         output_filename = f"{student_code}.docx"
 
+    app_name, entity_singular, entity_plural = get_entity_config()
+
     doc = Document()
 
     # Set Margins
-    sections = doc.sections
-    for section in sections:
+    for section in doc.sections:
         section.top_margin = Inches(1)
         section.bottom_margin = Inches(1)
         section.left_margin = Inches(1)
@@ -20,10 +42,10 @@ def create_report(student_code="QE190042", full_name="Nguyen Van Quy", output_fi
 
     # Document Title
     title = doc.add_paragraph()
-    title_run = title.add_run("PRACTICAL EXAM REPORT - MMA301")
+    title_run = title.add_run(f"PRACTICAL EXAM REPORT - MMA301\n{app_name.upper()}")
     title_run.bold = True
-    title_run.font.size = Pt(20)
-    title_run.font.color.rgb = RGBColor(37, 99, 235) # Blue
+    title_run.font.size = Pt(18)
+    title_run.font.color.rgb = RGBColor(37, 99, 235)
     title.alignment = WD_ALIGN_PARAGRAPH.CENTER
 
     sub_title = doc.add_paragraph()
@@ -34,9 +56,8 @@ def create_report(student_code="QE190042", full_name="Nguyen Van Quy", output_fi
 
     doc.add_paragraph().paragraph_format.space_after = Pt(12)
 
-    # Required Information Section (Template from Section 4 of exam)
-    info_heading = doc.add_heading("1. Student & Project Information", level=1)
-    info_heading.paragraph_format.space_after = Pt(8)
+    # Section 1: Required Information Section
+    doc.add_heading("1. Student & Project Information", level=1)
 
     info_data = [
         ("Student Code", student_code),
@@ -76,30 +97,30 @@ def create_report(student_code="QE190042", full_name="Nguyen Van Quy", output_fi
     doc.add_heading("2. Application Screenshots & Feature Verification", level=1)
     p_desc = doc.add_paragraph()
     p_desc.add_run(
-        "Below are all 16 required screenshots captured from the application and Firebase Console, "
+        f"Below are all 16 required screenshots captured from {app_name} and Firebase Console, "
         "ordered and captioned exactly as specified in the exam requirements."
     ).font.size = Pt(10.5)
 
     screenshots_list = [
         ("1. Firebase console — Authentication", "The Users list showing your test account."),
-        ("2. Firebase console — Firestore data", "The books collection with at least 3 sample documents belonging to your test account."),
+        ("2. Firebase console — Firestore data", f"The {entity_plural} collection with at least 3 sample documents belonging to your test account."),
         ("3. Firebase console — Security Rules", "The Rules tab showing the rules you actually have published, not just saved in an editor."),
         ("4. Register screen — validation", "The form submitted empty, showing the error messages."),
         ("5. Register screen — success", "Right after a successful sign-up, showing Registration successful."),
         ("6. Login screen", "The empty sign-in form."),
-        ("7. List screen — after login", "Showing the user’s e-mail, the Logout button, and at least 3 books already in the list."),
-        ("8. Add Book form — validation", "The form submitted empty or with bad input, showing the error messages."),
-        ("9. Add Book form — success", "Right after adding a book, showing Book added and the new book now in the list."),
-        ("10. Filters and search", "The genre filter, status filter, favorites-only switch, and search box each changing what is shown."),
-        ("11. Summary", "book-count, favorite-count and the status breakdown visible, with more than one status represented."),
-        ("12. Detail screen — view mode", "One book’s full details (title, author, genre, status, rating, notes)."),
+        ("7. List screen — after login", f"Showing the user’s e-mail, the Logout button, and at least 3 {entity_plural} already in the list."),
+        (f"8. Add {entity_singular.capitalize()} form — validation", "The form submitted empty or with bad input, showing the error messages."),
+        (f"9. Add {entity_singular.capitalize()} form — success", f"Right after adding a {entity_singular}, showing success banner and the item in list."),
+        ("10. Filters and search", "The category filter, status filter, favorites-only switch, and search box each changing what is shown."),
+        ("11. Summary", f"{entity_singular}-count, favorite-count and status breakdown visible, with more than one status represented."),
+        ("12. Detail screen — view mode", f"One {entity_singular}’s full details."),
         ("13. Detail screen — edit mode, validation", "An edit submitted with bad input, showing the error messages."),
         ("14. Detail screen — after Save", "Showing the edited values now saved."),
-        ("15. Favorite toggle and Delete", "A before/after pair showing the star toggled, and a book deleted and gone from the list."),
-        ("16. Empty state", "The books-empty screen with the text No books found (captured with a fresh account without books)."),
+        ("15. Favorite toggle and Delete", f"A before/after pair showing the star toggled, and a {entity_singular} deleted and gone from the list."),
+        ("16. Empty state", f"The empty screen with the text No {entity_plural} found (captured with a fresh account without items)."),
     ]
 
-    screenshots_dir = os.path.join(os.getcwd(), "screenshots")
+    screenshots_dir = os.path.join(os.path.dirname(__file__), "..", "screenshots")
     if not os.path.exists(screenshots_dir):
         os.makedirs(screenshots_dir)
 
@@ -110,7 +131,6 @@ def create_report(student_code="QE190042", full_name="Nguyen Van Quy", output_fi
         r_note.font.size = Pt(10)
         r_note.font.italic = True
 
-        # Check if an image exists in screenshots/
         img_candidates = [
             os.path.join(screenshots_dir, f"{idx}.png"),
             os.path.join(screenshots_dir, f"{idx}.jpg"),

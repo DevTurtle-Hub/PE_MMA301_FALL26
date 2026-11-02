@@ -15,17 +15,19 @@ import { NavigationProp } from '../navigation/types';
 import { useAuth } from '../context/AuthContext';
 import { useBooks } from '../context/BookContext';
 import { Card, Badge, Button, BadgeVariant } from '../components/ui';
-import { BookFormData, GENRES, STATUSES, Status } from '../types';
+import { BookFormData, Status } from '../types';
 import { BookForm } from '../components/BookForm';
+import { ENTITY_CONFIG } from '../config/entityConfig';
 
 export const ListScreen: React.FC = () => {
+  const cfg = ENTITY_CONFIG;
   const navigation = useNavigation<NavigationProp<'List'>>();
   const { user, logout } = useAuth();
   const { books, loading, addBook, toggleFavorite } = useBooks();
 
   // Filters & Search State
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedGenre, setSelectedGenre] = useState<string>('All');
+  const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [selectedStatus, setSelectedStatus] = useState<string>('All');
   const [favoritesOnly, setFavoritesOnly] = useState<boolean>(false);
   const [showAddForm, setShowAddForm] = useState<boolean>(false);
@@ -33,7 +35,7 @@ export const ListScreen: React.FC = () => {
   // Clear all filters
   const handleClearFilters = () => {
     setSearchQuery('');
-    setSelectedGenre('All');
+    setSelectedCategory('All');
     setSelectedStatus('All');
     setFavoritesOnly(false);
   };
@@ -47,22 +49,22 @@ export const ListScreen: React.FC = () => {
         b.title.toLowerCase().includes(cleanSearch) ||
         b.author.toLowerCase().includes(cleanSearch);
 
-      const matchGenre = selectedGenre === 'All' || b.genre === selectedGenre;
+      const matchCategory = selectedCategory === 'All' || b.genre === selectedCategory;
       const matchStatus = selectedStatus === 'All' || b.status === selectedStatus;
       const matchFavorite = !favoritesOnly || b.favorite === true;
 
-      return matchSearch && matchGenre && matchStatus && matchFavorite;
+      return matchSearch && matchCategory && matchStatus && matchFavorite;
     });
-  }, [books, searchQuery, selectedGenre, selectedStatus, favoritesOnly]);
+  }, [books, searchQuery, selectedCategory, selectedStatus, favoritesOnly]);
 
   // Summary counts
-  const totalBookCount = filteredBooks.length;
-  const favoriteBookCount = filteredBooks.filter((b) => b.favorite).length;
+  const totalCount = filteredBooks.length;
+  const favoriteCount = filteredBooks.filter((b) => b.favorite).length;
 
   // Status breakdown:
   // "one row per status that appears, the status with the most books first (equal counts: To Read, then Reading, then Finished)"
   const statusBreakdown = useMemo(() => {
-    const defaultPriority: Record<Status, number> = {
+    const defaultPriority: Record<string, number> = cfg.status.priorities || {
       'To Read': 1,
       Reading: 2,
       Finished: 3,
@@ -80,13 +82,13 @@ export const ListScreen: React.FC = () => {
 
     entries.sort((a, b) => {
       if (b.count !== a.count) {
-        return b.count - a.count; // most books first
+        return b.count - a.count; // most items first
       }
       return (defaultPriority[a.status] || 99) - (defaultPriority[b.status] || 99);
     });
 
     return entries;
-  }, [filteredBooks]);
+  }, [filteredBooks, cfg.status.priorities]);
 
   const getStatusBadge = (status: string): { label: string; variant: BadgeVariant } => {
     switch (status) {
@@ -95,7 +97,7 @@ export const ListScreen: React.FC = () => {
       case 'Reading':
         return { label: 'Reading', variant: 'blue' };
       default:
-        return { label: 'To Read', variant: 'yellow' };
+        return { label: status, variant: 'yellow' };
     }
   };
 
@@ -108,7 +110,7 @@ export const ListScreen: React.FC = () => {
       {/* Header: User Email and Logout button */}
       <View style={styles.header}>
         <View style={{ flex: 1, marginRight: 8 }}>
-          <Text style={styles.headerTitle}>BookShelf</Text>
+          <Text style={styles.headerTitle}>{cfg.appName}</Text>
           <Text style={styles.userEmail} numberOfLines={1}>
             {user?.email}
           </Text>
@@ -123,11 +125,11 @@ export const ListScreen: React.FC = () => {
       </View>
 
       <ScrollView contentContainerStyle={styles.scrollContainer} keyboardShouldPersistTaps="handled">
-        {/* Toggle / Add Book Section */}
+        {/* Toggle / Add Section */}
         <View style={styles.formToggleRow}>
-          <Text style={styles.sectionHeaderTitle}>Manage Books</Text>
+          <Text style={styles.sectionHeaderTitle}>Manage {cfg.entityPlural}</Text>
           <Button
-            title={showAddForm ? 'Hide Form' : '+ Add a Book'}
+            title={showAddForm ? 'Hide Form' : `+ Add a ${cfg.entitySingular}`}
             onPress={() => setShowAddForm(!showAddForm)}
             variant={showAddForm ? 'outline' : 'primary'}
             style={styles.toggleFormBtn}
@@ -135,7 +137,7 @@ export const ListScreen: React.FC = () => {
           />
         </View>
 
-        {/* Section A: Add a book form (book-form) */}
+        {/* Section A: Add form */}
         {showAddForm ? <BookForm onSubmit={handleAddSubmit} /> : null}
 
         {/* Section C: Filter, search and summary */}
@@ -145,7 +147,7 @@ export const ListScreen: React.FC = () => {
           {/* Search box */}
           <TextInput
             style={styles.searchInput}
-            placeholder="Search by title or author..."
+            placeholder={`Search by ${cfg.field1.label.toLowerCase()} or ${cfg.field2.label.toLowerCase()}...`}
             placeholderTextColor="#9CA3AF"
             value={searchQuery}
             autoCapitalize="none"
@@ -153,16 +155,16 @@ export const ListScreen: React.FC = () => {
             onChangeText={setSearchQuery}
           />
 
-          {/* Genre filter */}
-          <Text style={styles.filterLabel}>Genre:</Text>
+          {/* Category filter */}
+          <Text style={styles.filterLabel}>{cfg.category.label}:</Text>
           <View style={styles.chipsRow}>
-            {['All', ...GENRES].map((g) => (
+            {['All', ...cfg.category.options].map((g) => (
               <TouchableOpacity
                 key={g}
-                style={[styles.filterChip, selectedGenre === g && styles.filterChipActive]}
-                onPress={() => setSelectedGenre(g)}
+                style={[styles.filterChip, selectedCategory === g && styles.filterChipActive]}
+                onPress={() => setSelectedCategory(g)}
               >
-                <Text style={[styles.filterChipText, selectedGenre === g && styles.filterChipTextActive]}>
+                <Text style={[styles.filterChipText, selectedCategory === g && styles.filterChipTextActive]}>
                   {g}
                 </Text>
               </TouchableOpacity>
@@ -170,9 +172,9 @@ export const ListScreen: React.FC = () => {
           </View>
 
           {/* Status filter */}
-          <Text style={styles.filterLabel}>Status:</Text>
+          <Text style={styles.filterLabel}>{cfg.status.label}:</Text>
           <View style={styles.chipsRow}>
-            {['All', ...STATUSES].map((s) => (
+            {['All', ...cfg.status.options].map((s) => (
               <TouchableOpacity
                 key={s}
                 style={[styles.filterChip, selectedStatus === s && styles.filterChipActive]}
@@ -208,18 +210,26 @@ export const ListScreen: React.FC = () => {
           <Text style={styles.summaryTitle}>Collection Summary</Text>
           <View style={styles.summaryStatsRow}>
             <View style={styles.statBox}>
-              <Text style={styles.statLabel}>Total Books</Text>
-              {/* Requirement: book-count, plain integer */}
-              <Text testID="book-count" accessibilityLabel="book-count" style={styles.statNumber}>
-                {totalBookCount}
+              <Text style={styles.statLabel}>Total {cfg.entityPlural}</Text>
+              {/* Requirement: countTestId, plain integer */}
+              <Text
+                testID={cfg.countTestId}
+                accessibilityLabel={cfg.countTestId}
+                style={styles.statNumber}
+              >
+                {totalCount}
               </Text>
             </View>
 
             <View style={styles.statBox}>
               <Text style={styles.statLabel}>Favorites</Text>
-              {/* Requirement: favorite-count, plain integer */}
-              <Text testID="favorite-count" accessibilityLabel="favorite-count" style={styles.statNumber}>
-                {favoriteBookCount}
+              {/* Requirement: favoriteCountTestId, plain integer */}
+              <Text
+                testID={cfg.favoriteCountTestId}
+                accessibilityLabel={cfg.favoriteCountTestId}
+                style={styles.statNumber}
+              >
+                {favoriteCount}
               </Text>
             </View>
           </View>
@@ -231,7 +241,7 @@ export const ListScreen: React.FC = () => {
               {statusBreakdown.map((item) => (
                 <View key={item.status} style={styles.breakdownRow}>
                   <Text style={styles.breakdownStatusName}>{item.status}</Text>
-                  <Text style={styles.breakdownStatusCount}>{item.count} books</Text>
+                  <Text style={styles.breakdownStatusCount}>{item.count} items</Text>
                 </View>
               ))}
             </View>
@@ -239,16 +249,20 @@ export const ListScreen: React.FC = () => {
         </Card>
 
         {/* Section B: The List */}
-        <Text style={styles.sectionHeaderTitle}>Book List</Text>
+        <Text style={styles.sectionHeaderTitle}>{cfg.entityPlural} List</Text>
 
         {loading && books.length === 0 ? (
           <View style={styles.centerContainer}>
             <ActivityIndicator size="large" color="#2563EB" />
           </View>
         ) : filteredBooks.length === 0 ? (
-          // Requirement: "display books-empty with the text No books found instead of the list"
-          <View testID="books-empty" accessibilityLabel="books-empty" style={styles.emptyContainer}>
-            <Text style={styles.emptyText}>No books found</Text>
+          // Requirement: emptyListTestId with emptyListText
+          <View
+            testID={cfg.emptyListTestId}
+            accessibilityLabel={cfg.emptyListTestId}
+            style={styles.emptyContainer}
+          >
+            <Text style={styles.emptyText}>{cfg.emptyListText}</Text>
           </View>
         ) : (
           filteredBooks.map((item) => {
@@ -256,8 +270,8 @@ export const ListScreen: React.FC = () => {
             return (
               <Card
                 key={item.id}
-                testID="book-item"
-                accessibilityLabel="book-item"
+                testID={cfg.itemTestId}
+                accessibilityLabel={cfg.itemTestId}
                 style={styles.bookCard}
                 onPress={() => item.id && navigation.navigate('Detail', { bookId: item.id })}
               >
@@ -289,7 +303,7 @@ export const ListScreen: React.FC = () => {
                 </View>
 
                 <View style={styles.cardFooter}>
-                  <Text style={styles.genreText}>Genre: {item.genre}</Text>
+                  <Text style={styles.genreText}>{cfg.category.label}: {item.genre}</Text>
                   {item.rating !== undefined ? (
                     <Text style={styles.ratingText}>
                       {'★'.repeat(item.rating)} ({item.rating}/5)
