@@ -12,6 +12,7 @@ export interface Book {
   genre: Genre;
   status: Status;
   rating?: number; // 0..5
+  favorite?: boolean; // false by default
   notes?: string;  // <= 300 characters
   createdAt?: any;
 }
@@ -22,6 +23,6 @@ export interface BookFormData {
   genre: Genre;
   status: Status;
   rating?: number;
+  favorite?: boolean;
   notes?: string;
 }
-

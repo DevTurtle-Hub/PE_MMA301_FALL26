@@ -10,36 +10,71 @@ export const HomeScreen: React.FC = () => {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <ScrollView contentContainerStyle={styles.container}>
-        <View style={styles.heroSection}>
-          <Text style={styles.badgeText}>PE MMA301 Boilerplate</Text>
-          <Text style={styles.heroTitle}>BookShelf Manager</Text>
-          <Text style={styles.heroSubtitle}>
-            A complete Expo + React Native + Firebase Boilerplate ready for practical exam tasks.
-          </Text>
-        </View>
-
-        <Card style={styles.infoCard}>
-          <Text style={styles.infoTitle}>🚀 Key Features Included</Text>
-          <Text style={styles.infoItem}>• Firebase Authentication (Email/Password)</Text>
-          <Text style={styles.infoItem}>• AsyncStorage Auth Persistence</Text>
-          <Text style={styles.infoItem}>• Cloud Firestore Realtime Sync</Text>
-          <Text style={styles.infoItem}>• Complete Client-side & Security Rule Validation</Text>
-          <Text style={styles.infoItem}>• Pre-styled Reusable UI Components</Text>
-        </Card>
-
-        <View style={styles.buttonGroup}>
+      {/* Header with App Name and Login / Register buttons */}
+      <View style={styles.header}>
+        <Text style={styles.headerAppName}>BookShelf</Text>
+        <View style={styles.headerBtnGroup}>
           <Button
-            title="Sign In with Existing Account"
+            title="Login"
             onPress={() => navigation.navigate('Login')}
-            variant="primary"
-            style={styles.btn}
+            variant="outline"
+            style={styles.headerBtn}
+            textStyle={{ fontSize: 13 }}
           />
           <Button
-            title="Create New Account"
+            title="Register"
+            onPress={() => navigation.navigate('Register')}
+            variant="primary"
+            style={styles.headerBtn}
+            textStyle={{ fontSize: 13 }}
+          />
+        </View>
+      </View>
+
+      <ScrollView contentContainerStyle={styles.container}>
+        {/* Title with exact testID="home-title" and text="BookShelf" */}
+        <Text testID="home-title" accessibilityLabel="home-title" style={styles.title}>
+          BookShelf
+        </Text>
+
+        <Text style={styles.description}>
+          Keep your own private list of books you own or want to read, sorted into reading statuses and genres, with favorite tracking.
+        </Text>
+
+        {/* At least three feature cards */}
+        <Card style={styles.featureCard}>
+          <Text style={styles.featureTitle}>📚 Track your books</Text>
+          <Text style={styles.featureDesc}>
+            Add and manage books in your private reading collection with custom notes and star ratings.
+          </Text>
+        </Card>
+
+        <Card style={styles.featureCard}>
+          <Text style={styles.featureTitle}>🏷️ Sort by status</Text>
+          <Text style={styles.featureDesc}>
+            Organize books seamlessly into To Read, Reading, and Finished states with instant filtering.
+          </Text>
+        </Card>
+
+        <Card style={styles.featureCard}>
+          <Text style={styles.featureTitle}>⭐ Rate your favorites</Text>
+          <Text style={styles.featureDesc}>
+            Star your favorite reads with one tap and filter favorite titles instantly.
+          </Text>
+        </Card>
+
+        <View style={styles.actionSection}>
+          <Button
+            title="Get Started - Sign In"
+            onPress={() => navigation.navigate('Login')}
+            variant="primary"
+            style={styles.actionBtn}
+          />
+          <Button
+            title="Create an Account"
             onPress={() => navigation.navigate('Register')}
             variant="outline"
-            style={styles.btn}
+            style={styles.actionBtn}
           />
         </View>
       </ScrollView>
@@ -52,59 +87,69 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#F9FAFB',
   },
-  container: {
-    flexGrow: 1,
-    padding: 20,
-    justifyContent: 'center',
-  },
-  heroSection: {
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 24,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    backgroundColor: '#FFFFFF',
+    borderBottomWidth: 1,
+    borderBottomColor: '#E5E7EB',
   },
-  badgeText: {
-    backgroundColor: '#EEF2FF',
-    color: '#4F46E5',
-    fontWeight: '700',
-    fontSize: 12,
-    paddingHorizontal: 12,
-    paddingVertical: 4,
-    borderRadius: 20,
-    marginBottom: 12,
-  },
-  heroTitle: {
-    fontSize: 28,
+  headerAppName: {
+    fontSize: 18,
     fontWeight: '800',
+    color: '#2563EB',
+  },
+  headerBtnGroup: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  headerBtn: {
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 6,
+  },
+  container: {
+    padding: 20,
+    paddingBottom: 40,
+  },
+  title: {
+    fontSize: 32,
+    fontWeight: '900',
     color: '#111827',
     textAlign: 'center',
+    marginTop: 10,
+    marginBottom: 8,
   },
-  heroSubtitle: {
-    fontSize: 14,
-    color: '#6B7280',
+  description: {
+    fontSize: 15,
+    color: '#4B5563',
     textAlign: 'center',
-    marginTop: 8,
-    lineHeight: 20,
-    paddingHorizontal: 16,
-  },
-  infoCard: {
+    lineHeight: 22,
     marginBottom: 24,
-    backgroundColor: '#FFFFFF',
+    paddingHorizontal: 10,
   },
-  infoTitle: {
-    fontSize: 16,
+  featureCard: {
+    marginBottom: 14,
+  },
+  featureTitle: {
+    fontSize: 17,
     fontWeight: '700',
     color: '#1F2937',
-    marginBottom: 10,
+    marginBottom: 6,
   },
-  infoItem: {
+  featureDesc: {
     fontSize: 14,
-    color: '#4B5563',
-    lineHeight: 22,
+    color: '#6B7280',
+    lineHeight: 20,
   },
-  buttonGroup: {
+  actionSection: {
+    marginTop: 16,
     gap: 12,
   },
-  btn: {
+  actionBtn: {
     width: '100%',
   },
 });
-

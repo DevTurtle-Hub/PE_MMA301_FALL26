@@ -26,19 +26,15 @@ export const LoginScreen: React.FC = () => {
   const [submitting, setSubmitting] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
 
-  // Field validations (dynamic real-time calculation)
+  // Field validations (exact exam messages)
   const trimmedEmail = email.trim();
   const emailError = !trimmedEmail
-    ? 'Email is required.'
+    ? 'Email is required'
     : !EMAIL_REGEX.test(trimmedEmail)
-    ? 'Invalid email format (e.g. user@example.com).'
+    ? 'Please enter a valid email address'
     : '';
 
-  const passwordError = !password
-    ? 'Password is required.'
-    : password.length < 6
-    ? 'Password must be at least 6 characters.'
-    : '';
+  const passwordError = !password ? 'Password is required' : '';
 
   const isFormValid = !emailError && !passwordError;
 

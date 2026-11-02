@@ -21,6 +21,7 @@ interface BookContextType {
   error: string | null;
   addBook: (data: BookFormData) => Promise<void>;
   updateBook: (id: string, data: Partial<BookFormData>) => Promise<void>;
+  toggleFavorite: (id: string) => Promise<void>;
   deleteBook: (id: string) => Promise<void>;
   clearError: () => void;
 }
@@ -48,8 +49,17 @@ export const BookProvider: React.FC<{ children: React.ReactNode }> = ({ children
       (snapshot) => {
         const booksData: Book[] = snapshot.docs.map((d) => ({
           id: d.id,
+          favorite: false,
           ...(d.data() as Omit<Book, 'id'>),
         }));
+
+        // Rule: "All the user’s books in alphabetical order by title (not case-sensitive; equal titles ordered by author)."
+        booksData.sort((a, b) => {
+          const titleComparison = a.title.localeCompare(b.title, undefined, { sensitivity: 'base' });
+          if (titleComparison !== 0) return titleComparison;
+          return a.author.localeCompare(b.author, undefined, { sensitivity: 'base' });
+        });
+
         setBooks(booksData);
         setLoading(false);
       },
@@ -68,23 +78,35 @@ export const BookProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const validateBookData = (data: Partial<BookFormData>) => {
     if (data.title !== undefined) {
       const trimmed = data.title.trim();
-      if (!trimmed || trimmed.length > 100) {
-        throw new Error('Title must be between 1 and 100 characters');
+      if (!trimmed) {
+        throw new Error('Title is required');
+      }
+      if (trimmed.length > 100) {
+        throw new Error('Title must be at most 100 characters');
       }
     }
     if (data.author !== undefined) {
       const trimmed = data.author.trim();
-      if (!trimmed || trimmed.length > 60) {
-        throw new Error('Author must be between 1 and 60 characters');
+      if (!trimmed) {
+        throw new Error('Author is required');
       }
+      if (trimmed.length > 60) {
+        throw new Error('Author must be at most 60 characters');
+      }
+    }
+    if (data.genre !== undefined && !data.genre) {
+      throw new Error('Please choose a genre');
+    }
+    if (data.status !== undefined && !data.status) {
+      throw new Error('Please choose a status');
     }
     if (data.rating !== undefined && data.rating !== null) {
       if (!Number.isInteger(data.rating) || data.rating < 0 || data.rating > 5) {
-        throw new Error('Rating must be an integer between 0 and 5');
+        throw new Error('Rating must be a whole number from 0 to 5');
       }
     }
     if (data.notes !== undefined && data.notes !== null && data.notes.length > 300) {
-      throw new Error('Notes must not exceed 300 characters');
+      throw new Error('Notes must be at most 300 characters');
     }
   };
 
@@ -96,9 +118,7 @@ export const BookProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const cleanTitle = data.title.trim();
     const cleanAuthor = data.author.trim();
 
-    // "Bẫy" Trùng lặp (Duplicate Rule):
-    // Case-insensitive duplicate prevention:
-    // docId = `${title.trim().toLowerCase()}_${author.trim().toLowerCase()}`
+    // "the same person cannot save the same title + author twice, even if the letter case differs"
     const docId = `${cleanTitle.toLowerCase()}_${cleanAuthor.toLowerCase()}`.replace(/\//g, '_');
 
     // 1. Client-side duplicate check
@@ -108,16 +128,16 @@ export const BookProvider: React.FC<{ children: React.ReactNode }> = ({ children
         b.author.trim().toLowerCase() === cleanAuthor.toLowerCase()
     );
     if (isDuplicate) {
-      const msg = `Duplicate entry: You already have "${cleanTitle}" by "${cleanAuthor}" in your library (case-insensitive).`;
+      const msg = `Duplicate: "${cleanTitle}" by "${cleanAuthor}" is already in your library.`;
       setError(msg);
       throw new Error(msg);
     }
 
-    // 2. Server-side / Firestore check on the deterministic docId
+    // 2. Server-side check
     const bookRef = doc(db, 'books', docId);
     const existingSnap = await getDoc(bookRef);
     if (existingSnap.exists()) {
-      const msg = `Duplicate entry: A book with this title and author already exists in Firestore.`;
+      const msg = `Duplicate: A book with this title and author already exists in Firestore.`;
       setError(msg);
       throw new Error(msg);
     }
@@ -128,6 +148,7 @@ export const BookProvider: React.FC<{ children: React.ReactNode }> = ({ children
       author: cleanAuthor,
       genre: data.genre,
       status: data.status,
+      favorite: data.favorite ?? false,
       createdAt: serverTimestamp(),
     };
 
@@ -165,7 +186,7 @@ export const BookProvider: React.FC<{ children: React.ReactNode }> = ({ children
       );
 
       if (duplicate) {
-        const msg = `Duplicate entry: Another book with this title and author already exists (case-insensitive).`;
+        const msg = `Duplicate: Another book with this title and author already exists.`;
         setError(msg);
         throw new Error(msg);
       }
@@ -179,6 +200,7 @@ export const BookProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (data.author !== undefined) updatePayload.author = data.author.trim();
     if (data.genre !== undefined) updatePayload.genre = data.genre;
     if (data.status !== undefined) updatePayload.status = data.status;
+    if (data.favorite !== undefined) updatePayload.favorite = data.favorite;
     if (data.rating !== undefined) updatePayload.rating = data.rating;
     if (data.notes !== undefined) updatePayload.notes = data.notes.trim();
 
@@ -187,6 +209,24 @@ export const BookProvider: React.FC<{ children: React.ReactNode }> = ({ children
       await updateDoc(bookRef, updatePayload);
     } catch (err: any) {
       setError(err.message || 'Failed to update book');
+      throw err;
+    }
+  };
+
+  const toggleFavorite = async (id: string) => {
+    if (!user) throw new Error('You must be signed in');
+    const book = books.find((b) => b.id === id);
+    if (!book) return;
+
+    const newFavorite = !book.favorite;
+    try {
+      const bookRef = doc(db, 'books', id);
+      await updateDoc(bookRef, {
+        userId: user.uid,
+        favorite: newFavorite,
+      });
+    } catch (err: any) {
+      setError(err.message || 'Failed to toggle favorite');
       throw err;
     }
   };
@@ -212,6 +252,7 @@ export const BookProvider: React.FC<{ children: React.ReactNode }> = ({ children
         error,
         addBook,
         updateBook,
+        toggleFavorite,
         deleteBook,
         clearError,
       }}

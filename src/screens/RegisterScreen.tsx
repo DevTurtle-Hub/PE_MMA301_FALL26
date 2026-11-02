@@ -28,24 +28,24 @@ export const RegisterScreen: React.FC = () => {
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [authError, setAuthError] = useState<string | null>(null);
 
-  // Field validations (dynamic real-time calculation)
+  // Field validations (exact exam messages)
   const trimmedEmail = email.trim();
   const emailError = !trimmedEmail
-    ? 'Email is required.'
+    ? 'Email is required'
     : !EMAIL_REGEX.test(trimmedEmail)
-    ? 'Invalid email format (e.g. user@example.com).'
+    ? 'Please enter a valid email address'
     : '';
 
   const passwordError = !password
-    ? 'Password is required.'
+    ? 'Password is required'
     : password.length < 6
-    ? 'Password must be at least 6 characters.'
+    ? 'Password must be at least 6 characters'
     : '';
 
   const confirmError = !confirmPassword
-    ? 'Confirm password is required.'
+    ? 'Confirm password is required'
     : confirmPassword !== password
-    ? 'Passwords do not match.'
+    ? 'Passwords do not match'
     : '';
 
   const isFormValid = !emailError && !passwordError && !confirmError;
@@ -63,8 +63,7 @@ export const RegisterScreen: React.FC = () => {
     setSubmitting(true);
     try {
       await register(trimmedEmail, password);
-      // Requirement: "Đăng ký thành công hiện thông báo form-success với text: Registration successful."
-      setSuccessMessage('Registration successful.');
+      setSuccessMessage('Registration successful');
       setSubmitted(false);
     } catch (err: any) {
       let message = err.message || 'Registration failed.';

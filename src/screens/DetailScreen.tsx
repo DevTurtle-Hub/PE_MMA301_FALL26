@@ -12,16 +12,16 @@ import { useRoute, useNavigation } from '@react-navigation/native';
 import { ScreenRouteProp, NavigationProp } from '../navigation/types';
 import { useBooks } from '../context/BookContext';
 import { Card, Badge, Button, BadgeVariant } from '../components/ui';
-import { BookModal } from '../components/BookModal';
+import { BookForm } from '../components/BookForm';
 import { BookFormData } from '../types';
 
 export const DetailScreen: React.FC = () => {
   const route = useRoute<ScreenRouteProp<'Detail'>>();
   const navigation = useNavigation<NavigationProp<'Detail'>>();
   const { bookId } = route.params;
-  const { books, updateBook, deleteBook } = useBooks();
+  const { books, updateBook, toggleFavorite, deleteBook } = useBooks();
 
-  const [editModalVisible, setEditModalVisible] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
 
   const book = books.find((b) => b.id === bookId);
 
@@ -39,8 +39,8 @@ export const DetailScreen: React.FC = () => {
   const handleDelete = () => {
     if (!book) return;
     Alert.alert(
-      'Confirm Deletion',
-      `Are you sure you want to delete "${book.title}"? This action cannot be undone.`,
+      'Delete Book',
+      `Are you sure you want to delete "${book.title}"?`,
       [
         { text: 'Cancel', style: 'cancel' },
         {
@@ -61,6 +61,7 @@ export const DetailScreen: React.FC = () => {
 
   const handleEditSubmit = async (data: BookFormData) => {
     await updateBook(bookId, data);
+    setIsEditing(false); // Requirement: "Save updates the book in Firestore and returns to view mode"
   };
 
   if (!book) {
@@ -83,73 +84,105 @@ export const DetailScreen: React.FC = () => {
 
   return (
     <SafeAreaView style={styles.safeArea}>
+      {/* Top Bar */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
           <Text style={styles.backBtnText}>← Back</Text>
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Book Details</Text>
+        <Text style={styles.headerTitle}>{isEditing ? 'Edit Book' : 'Book Details'}</Text>
         <View style={{ width: 50 }} />
       </View>
 
-      <ScrollView contentContainerStyle={styles.container}>
-        <Card style={styles.mainCard}>
-          <View style={styles.titleRow}>
-            <View style={{ flex: 1, marginRight: 8 }}>
-              <Text style={styles.title}>{book.title}</Text>
-              <Text style={styles.author}>by {book.author}</Text>
-            </View>
-            <Badge label={badgeInfo.label} variant={badgeInfo.variant} />
-          </View>
-
-          <View style={styles.divider} />
-
-          <View style={styles.detailRow}>
-            <Text style={styles.label}>Genre:</Text>
-            <Text style={styles.value}>{book.genre}</Text>
-          </View>
-
-          <View style={styles.detailRow}>
-            <Text style={styles.label}>Status:</Text>
-            <Text style={styles.value}>{book.status}</Text>
-          </View>
-
-          <View style={styles.detailRow}>
-            <Text style={styles.label}>Rating:</Text>
-            <Text style={styles.value}>
-              {book.rating !== undefined ? `${'★'.repeat(book.rating)} (${book.rating}/5)` : 'Not rated yet'}
-            </Text>
-          </View>
-
-          {book.notes ? (
-            <View style={styles.notesSection}>
-              <Text style={styles.notesLabel}>Personal Notes:</Text>
-              <Text style={styles.notesText}>{book.notes}</Text>
-            </View>
-          ) : null}
-        </Card>
-
-        <View style={styles.actionRow}>
-          <Button
-            title="Edit Details"
-            onPress={() => setEditModalVisible(true)}
-            variant="primary"
-            style={styles.actionBtn}
+      <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
+        {isEditing ? (
+          // Requirement: "An Edit action switches the same fields into editable inputs with Save and Cancel buttons"
+          <BookForm
+            initialValues={{
+              title: book.title,
+              author: book.author,
+              genre: book.genre,
+              status: book.status,
+              rating: book.rating,
+              notes: book.notes,
+            }}
+            onSubmit={handleEditSubmit}
+            onCancel={() => setIsEditing(false)}
+            submitButtonText="Save Changes"
+            isEdit={true}
           />
-          <Button
-            title="Delete Book"
-            onPress={handleDelete}
-            variant="danger"
-            style={styles.actionBtn}
-          />
-        </View>
+        ) : (
+          // View Mode: title, author, genre, status, rating, notes and favorite toggle
+          <>
+            <Card style={styles.mainCard}>
+              <View style={styles.titleRow}>
+                <View style={{ flex: 1, marginRight: 8 }}>
+                  <Text style={styles.title}>{book.title}</Text>
+                  <Text style={styles.author}>by {book.author}</Text>
+                </View>
+
+                <View style={styles.rightActionRow}>
+                  <Badge label={badgeInfo.label} variant={badgeInfo.variant} />
+                  {/* Favorite Toggle Button */}
+                  <TouchableOpacity
+                    style={styles.starBtn}
+                    onPress={() => book.id && toggleFavorite(book.id)}
+                  >
+                    <Text style={[styles.starIcon, book.favorite && styles.starIconActive]}>
+                      {book.favorite ? '★' : '☆'}
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+
+              <View style={styles.divider} />
+
+              <View style={styles.detailRow}>
+                <Text style={styles.label}>Genre:</Text>
+                <Text style={styles.value}>{book.genre}</Text>
+              </View>
+
+              <View style={styles.detailRow}>
+                <Text style={styles.label}>Status:</Text>
+                <Text style={styles.value}>{book.status}</Text>
+              </View>
+
+              <View style={styles.detailRow}>
+                <Text style={styles.label}>Rating:</Text>
+                <Text style={styles.value}>
+                  {book.rating !== undefined ? `${'★'.repeat(book.rating)} (${book.rating}/5)` : 'Not rated yet'}
+                </Text>
+              </View>
+
+              <View style={styles.detailRow}>
+                <Text style={styles.label}>Favorite:</Text>
+                <Text style={styles.value}>{book.favorite ? 'Yes ⭐' : 'No'}</Text>
+              </View>
+
+              {book.notes ? (
+                <View style={styles.notesSection}>
+                  <Text style={styles.notesLabel}>Notes:</Text>
+                  <Text style={styles.notesText}>{book.notes}</Text>
+                </View>
+              ) : null}
+            </Card>
+
+            <View style={styles.actionRow}>
+              <Button
+                title="Edit Book"
+                onPress={() => setIsEditing(true)}
+                variant="primary"
+                style={styles.actionBtn}
+              />
+              <Button
+                title="Delete Book"
+                onPress={handleDelete}
+                variant="danger"
+                style={styles.actionBtn}
+              />
+            </View>
+          </>
+        )}
       </ScrollView>
-
-      <BookModal
-        visible={editModalVisible}
-        bookToEdit={book}
-        onClose={() => setEditModalVisible(false)}
-        onSubmit={handleEditSubmit}
-      />
     </SafeAreaView>
   );
 };
@@ -184,7 +217,8 @@ const styles = StyleSheet.create({
     color: '#111827',
   },
   container: {
-    padding: 20,
+    padding: 16,
+    paddingBottom: 40,
   },
   mainCard: {
     padding: 20,
@@ -200,9 +234,24 @@ const styles = StyleSheet.create({
     color: '#111827',
   },
   author: {
-    fontSize: 16,
+    fontSize: 15,
     color: '#4B5563',
     marginTop: 4,
+  },
+  rightActionRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  starBtn: {
+    padding: 4,
+  },
+  starIcon: {
+    fontSize: 24,
+    color: '#9CA3AF',
+  },
+  starIconActive: {
+    color: '#F59E0B',
   },
   divider: {
     height: 1,
@@ -260,4 +309,3 @@ const styles = StyleSheet.create({
     color: '#6B7280',
   },
 });
-

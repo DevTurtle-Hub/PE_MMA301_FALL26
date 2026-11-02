@@ -5,14 +5,24 @@ interface CardProps {
   children: React.ReactNode;
   style?: StyleProp<ViewStyle>;
   onPress?: () => void;
+  testID?: string;
+  accessibilityLabel?: string;
 }
 
-export const Card: React.FC<CardProps> = ({ children, style, onPress }) => {
+export const Card: React.FC<CardProps> = ({
+  children,
+  style,
+  onPress,
+  testID,
+  accessibilityLabel,
+}) => {
   if (onPress) {
     return (
       <TouchableOpacity
         activeOpacity={0.8}
         onPress={onPress}
+        testID={testID}
+        accessibilityLabel={accessibilityLabel}
         style={[styles.card, style]}
       >
         {children}
@@ -20,7 +30,15 @@ export const Card: React.FC<CardProps> = ({ children, style, onPress }) => {
     );
   }
 
-  return <View style={[styles.card, style]}>{children}</View>;
+  return (
+    <View
+      testID={testID}
+      accessibilityLabel={accessibilityLabel}
+      style={[styles.card, style]}
+    >
+      {children}
+    </View>
+  );
 };
 
 const styles = StyleSheet.create({
@@ -38,4 +56,3 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
 });
-
