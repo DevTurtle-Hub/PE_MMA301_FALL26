@@ -1,83 +1,114 @@
-# PE_MMA301_FALL26
+# PE_MMA301_FALL26 - BOILERPLATE CHUẨN THI PE (45 PHÚT)
 
-Ứng dụng React Native xây dựng với **Expo** (SDK 58) và **TypeScript**, quản lý state bằng **React Context**, kết nối backend **Google Firebase** (Authentication & Cloud Firestore).
+Boilerplate hoàn chỉnh cho môn **MMA301** xây dựng với **Expo (SDK 58) + TypeScript + React Navigation + Firebase Auth/Firestore + React Context State Management**.
+
+Khung dự án được thiết kế cố định 100%, chuẩn bị sẵn mọi thành phần để khi đi thi chỉ cần đổi model/chủ đề dữ liệu (Quản lý Sách, Chi tiêu, Khóa học, Task) là hoàn thành bài thi trong vòng 30 - 45 phút.
 
 ---
 
 ## 🛠️ Công nghệ & Thư viện sử dụng
-- **React Native & Expo**: Quản lý vòng đời ứng dụng, hỗ trợ iOS/Android/Web.
-- **TypeScript**: Định kiểu chặt chẽ cho Data Models & Props.
-- **React Context**: 
-  - `AuthContext`: Quản lý trạng thái xác thực (đăng nhập, đăng ký, đăng xuất, theo dõi auth state).
-  - `BookContext`: Quản lý danh sách sách, realtime sync qua Firestore onSnapshot, CRUD.
-- **Google Firebase**:
-  - `firebase/auth`: Xác thực email/password với AsyncStorage persistence.
-  - `firebase/firestore`: Cơ sở dữ liệu NoSQL đám mây.
-- **Firebase CLI (`firebase-tools`)**: Hỗ trợ quản lý và deploy `firestore.rules`.
+- **React Native & Expo**: SDK 58.0.22, React Native 0.88.1.
+- **Navigation**: `@react-navigation/native` & `@react-navigation/native-stack` + `react-native-screens` + `react-native-safe-area-context`.
+- **State Management**: **React Context** (`AuthContext`, `BookContext`).
+- **Backend Firebase**: `firebase` 13.x với persistence qua `@react-native-async-storage/async-storage`.
+- **Firebase CLI**: `firebase-tools` cài sẵn trong devDependencies để quản lý và deploy `firestore.rules`.
+- **Clean Code & Linting**: Tuân thủ chuẩn strict TypeScript và ESLint (`npx expo lint` & `npx tsc --noEmit` pass 100%).
 
 ---
 
-## 📁 Cấu trúc thư mục
+## 📁 Cấu trúc thư mục chuẩn bị sẵn
 
 ```text
-├── .env                  # Chứa Firebase config thực tế (được gitignore bảo vệ)
-├── .env.example          # File mẫu các biến môi trường
-├── firestore.rules       # Quy tắc bảo mật Firestore (bắt buộc)
-├── firebase.json         # Cấu hình Firebase CLI
-├── .firebaserc           # Định danh project Firebase
-├── App.tsx               # Component gốc tích hợp Auth & Book Providers
+├── .env                          # Chứa config Firebase (được .gitignore bảo vệ)
+├── .env.example                  # Mẫu các biến môi trường EXPO_PUBLIC_*
+├── firestore.rules               # Quy tắc bảo mật Firestore
+├── firebase.json                 # Cấu hình Firestore rules cho Firebase CLI
+├── .firebaserc                   # Project id Firebase
+├── App.tsx                       # NavigationContainer + SafeAreaProvider + AuthProvider
 └── src/
     ├── config/
-    │   └── firebase.ts   # Khởi tạo Firebase App, Auth & Firestore
+    │   └── firebaseConfig.ts     # Khởi tạo App, Auth (AsyncStorage persistence), Firestore
     ├── context/
-    │   ├── AuthContext.tsx  # React Context cho Auth
-    │   └── BookContext.tsx  # React Context cho Book CRUD
-    ├── types/
-    │   ├── index.ts      # Type definitions (Book, Genre, Status, ...)
-    │   └── firebase.d.ts # Module declaration hỗ trợ React Native
-    └── components/
-        ├── AuthScreen.tsx      # Giao diện Đăng nhập / Đăng ký
-        ├── BookListScreen.tsx  # Giao diện Danh sách sách & thao tác
-        └── BookModal.tsx       # Modal thêm mới / chỉnh sửa sách
+    │   ├── AuthContext.tsx       # login(), register(), logout(), user, onAuthStateChanged
+    │   └── BookContext.tsx       # Realtime onSnapshot, addBook, updateBook, deleteBook
+    ├── navigation/
+    │   ├── types.ts              # ParamList cho Stack Navigator
+    │   └── AppNavigator.tsx      # Logic: user == null (Home, Login, Register) | user != null (List, Detail)
+    ├── components/
+    │   ├── ui/                   # Reusable UI Base Components có sẵn bóng đổ & bo góc:
+    │   │   ├── Card.tsx          # Card có shadow iOS & elevation Android
+    │   │   ├── Button.tsx        # Button variants (primary, secondary, danger, outline) + loading
+    │   │   ├── Input.tsx         # Input hiển thị lỗi theo state `submitted`, đếm ký tự
+    │   │   ├── Badge.tsx         # Pill badge hiển thị trạng thái / danh mục
+    │   │   └── RatingPicker.tsx  # Bộ chọn sao 0 - 5
+    │   └── BookModal.tsx         # Modal thêm mới / sửa theo đúng validation
+    └── screens/
+        ├── HomeScreen.tsx        # Màn hình chào mừng khách (Home)
+        ├── LoginScreen.tsx       # Regex email, đếm ký tự pass, ẩn/hiện lỗi theo `submitted`
+        ├── RegisterScreen.tsx    # Regex email, pass min 6, confirm pass, ẩn/hiện lỗi
+        ├── ListScreen.tsx        # Danh sách sách, search, filter chips, button "+ Add"
+        └── DetailScreen.tsx      # Xem chi tiết, nút Sửa & Xóa có Alert xác nhận
 ```
 
 ---
 
-## 🔒 Quy tắc Firestore (`firestore.rules`)
-File `firestore.rules` tuân thủ các điều kiện:
-1. Người dùng phải đăng nhập (`request.auth != null`).
-2. Chỉ đọc, sửa, xóa dữ liệu thuộc về chính mình (`resource.data.userId == request.auth.uid`).
-3. Dữ liệu tạo mới (`create`):
-   - `title`: Chuỗi không rỗng, tối đa 100 ký tự.
-   - `author`: Chuỗi không rỗng, tối đa 60 ký tự.
-   - `genre`: Thuộc một trong `['Fiction', 'Non-Fiction', 'Academic', 'Other']`.
-   - `status`: Thuộc một trong `['To Read', 'Reading', 'Finished']`.
-   - `rating` (tùy chọn): Số nguyên từ 0 đến 5.
-   - `notes` (tùy chọn): Chuỗi tối đa 300 ký tự.
+## 🔒 Quy tắc bảo mật Firestore (`firestore.rules`)
+```javascript
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /books/{bookId} {
+      allow read, delete: if request.auth != null && resource.data.userId == request.auth.uid;
+      
+      allow create: if request.auth != null 
+        && request.resource.data.userId == request.auth.uid
+        && request.resource.data.title is string 
+        && request.resource.data.title.trim().size() > 0 
+        && request.resource.data.title.size() <= 100
+        && request.resource.data.author is string 
+        && request.resource.data.author.trim().size() > 0 
+        && request.resource.data.author.size() <= 60
+        && request.resource.data.genre in ['Fiction', 'Non-Fiction', 'Academic', 'Other']
+        && request.resource.data.status in ['To Read', 'Reading', 'Finished']
+        && (!('rating' in request.resource.data) || (request.resource.data.rating is int && request.resource.data.rating >= 0 && request.resource.data.rating <= 5))
+        && (!('notes' in request.resource.data) || (request.resource.data.notes is string && request.resource.data.notes.size() <= 300));
+
+      allow update: if request.auth != null 
+        && resource.data.userId == request.auth.uid
+        && request.resource.data.userId == request.auth.uid;
+    }
+  }
+}
+```
 
 ---
 
-## 🚀 Hướng dẫn cài đặt & Chạy ứng dụng
+## 🎯 BÍ KÍP ĐI THI: CÁCH ĐỔI ĐỀ BÀI TRONG 10 PHÚT
 
-1. **Cài đặt thư viện:**
-   ```bash
-   npm install
-   ```
+Khi đề thi yêu cầu chủ đề khác (ví dụ: Quản lý Chi tiêu `expenses` hoặc Quản lý Khóa học `courses`):
+1. **Đổi Type trong `src/types/index.ts`**:
+   - Đổi tên các trường (`title`, `amount`, `category`, `date`, ...).
+2. **Đổi `firestore.rules`**:
+   - Đổi `match /books/{bookId}` thành `match /expenses/{expenseId}` và các field tương ứng.
+3. **Đổi `BookContext.tsx`**:
+   - Đổi collection `'books'` thành tên collection mới.
+4. **Form & Màn hình đã chuẩn bị sẵn**:
+   - Dùng sẵn `Input`, `Button`, `Card`, `Badge` đã có đầy đủ style và validation, chỉ cần gắn field mới vào là chạy mượt mà!
 
-2. **Cấu hình biến môi trường:**
-   Tạo file `.env` dựa trên `.env.example`:
-   ```bash
-   cp .env.example .env
-   ```
-   (Điền các giá trị `EXPO_PUBLIC_FIREBASE_*` tương ứng)
+---
 
-3. **Chạy ứng dụng:**
-   ```bash
-   npx expo start
-   ```
+## 🚀 Các lệnh thường dùng
 
-4. **Deploy Firestore Rules với Firebase CLI:**
-   ```bash
-   npx firebase login
-   npm run deploy:rules
-   ```
+```bash
+# Chạy app trên máy ảo hoặc thiết bị thật (Expo Go)
+npx expo start
+
+# Kiểm tra cú pháp & type
+npx tsc --noEmit
+
+# Kiểm tra linting
+npx expo lint
+
+# Deploy firestore rules lên Firebase
+npm run deploy:rules
+```

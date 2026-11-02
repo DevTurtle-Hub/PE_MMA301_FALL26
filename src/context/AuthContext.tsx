@@ -6,12 +6,15 @@ import {
   signOut as firebaseSignOut, 
   onAuthStateChanged 
 } from 'firebase/auth';
-import { auth } from '../config/firebase';
+import { auth } from '../config/firebaseConfig';
 
 interface AuthContextType {
   user: User | null;
   loading: boolean;
   error: string | null;
+  login: (email: string, pass: string) => Promise<void>;
+  register: (email: string, pass: string) => Promise<void>;
+  logout: () => Promise<void>;
   signIn: (email: string, pass: string) => Promise<void>;
   signUp: (email: string, pass: string) => Promise<void>;
   signOut: () => Promise<void>;
@@ -36,32 +39,35 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const clearError = () => setError(null);
 
-  const signIn = async (email: string, pass: string) => {
+  const login = async (email: string, pass: string) => {
     setError(null);
     try {
       await signInWithEmailAndPassword(auth, email.trim(), pass);
     } catch (err: any) {
-      setError(err.message || 'Failed to sign in');
+      const msg = err.message || 'Failed to sign in';
+      setError(msg);
       throw err;
     }
   };
 
-  const signUp = async (email: string, pass: string) => {
+  const register = async (email: string, pass: string) => {
     setError(null);
     try {
       await createUserWithEmailAndPassword(auth, email.trim(), pass);
     } catch (err: any) {
-      setError(err.message || 'Failed to sign up');
+      const msg = err.message || 'Failed to register';
+      setError(msg);
       throw err;
     }
   };
 
-  const signOut = async () => {
+  const logout = async () => {
     setError(null);
     try {
       await firebaseSignOut(auth);
     } catch (err: any) {
-      setError(err.message || 'Failed to sign out');
+      const msg = err.message || 'Failed to sign out';
+      setError(msg);
       throw err;
     }
   };
@@ -72,9 +78,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         user,
         loading,
         error,
-        signIn,
-        signUp,
-        signOut,
+        login,
+        register,
+        logout,
+        signIn: login,
+        signUp: register,
+        signOut: logout,
         clearError,
       }}
     >
@@ -90,4 +99,3 @@ export const useAuth = (): AuthContextType => {
   }
   return context;
 };
-
