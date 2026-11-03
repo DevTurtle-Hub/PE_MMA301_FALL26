@@ -146,9 +146,9 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const clean1 = data.title.trim();
     const clean2 = (data.director !== undefined ? data.director : data.author || '').trim();
 
-    // Deterministic docId preventing case-insensitive duplicates
-    // "the same person cannot save the same title + director twice, even if the letter case differs"
-    const docId = `${clean1.toLowerCase()}_${clean2.toLowerCase()}`.replace(/\//g, '_');
+    // Deterministic docId preventing case-insensitive duplicates per user
+    // "the same person cannot save the same title + director twice, even if the letter case differs; two different people may save the same movie."
+    const docId = `${user.uid}_${clean1.toLowerCase()}_${clean2.toLowerCase()}`.replace(/[\/\s]/g, '_');
 
     // 1. Client-side duplicate check
     const isDuplicate = items.some(
@@ -172,6 +172,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
 
     const newPayload: Record<string, any> = {
+      id: docId,
       userId: user.uid,
       [cfg.field1.key]: clean1,
       [cfg.field2.key]: clean2,

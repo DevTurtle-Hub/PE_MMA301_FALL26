@@ -46,7 +46,7 @@ export const RegisterScreen: React.FC = () => {
     : '';
 
   const confirmError = !confirmPassword
-    ? 'Confirm Password is required'
+    ? 'Confirm password is required'
     : confirmPassword !== password
     ? 'Passwords do not match'
     : '';

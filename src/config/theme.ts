@@ -38,3 +38,4 @@ export const THEME = {
   success: '#0F172A',
   successBg: '#FEF3C7',
 };
+

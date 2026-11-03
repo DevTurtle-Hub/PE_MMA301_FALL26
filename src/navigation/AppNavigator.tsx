@@ -12,6 +12,8 @@ import { RegisterScreen } from '../screens/RegisterScreen';
 import { ListScreen } from '../screens/ListScreen';
 import { DetailScreen } from '../screens/DetailScreen';
 
+import { THEME } from '../config/theme';
+
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export const AppNavigator: React.FC = () => {
@@ -22,7 +24,7 @@ export const AppNavigator: React.FC = () => {
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#2563EB" />
+        <ActivityIndicator size="large" color={THEME.primary} />
       </View>
     );
   }
