@@ -1,32 +1,36 @@
-export type Genre = string;
-export const GENRES: Genre[] = ['Fiction', 'Non-Fiction', 'Academic', 'Other'];
+export type Genre = 'Action' | 'Comedy' | 'Drama' | 'Horror' | string;
+export const GENRES = ['Action', 'Comedy', 'Drama', 'Horror'];
 
-export type Status = string;
-export const STATUSES: Status[] = ['To Read', 'Reading', 'Finished'];
+export type Status = 'Plan to Watch' | 'Watching' | 'Watched' | string;
+export const STATUSES = ['Plan to Watch', 'Watching', 'Watched'];
 
-export interface Book {
+export interface Movie {
   id?: string;
   userId: string;
   title: string;
-  author: string;
-  genre: string;
-  status: string;
+  director: string;
+  author?: string; // alias for compatibility
+  genre: Genre;
+  status: Status;
   rating?: number; // 0..5
   favorite?: boolean; // false by default
   notes?: string;  // <= 300 characters
   createdAt?: any;
 }
 
-export interface BookFormData {
+export interface MovieFormData {
   title: string;
-  author: string;
-  genre: string;
-  status: string;
+  director?: string;
+  author?: string; // alias for compatibility
+  genre: Genre;
+  status: Status;
   rating?: number;
   favorite?: boolean;
   notes?: string;
 }
 
-// Generic Aliases for fast multi-topic exams
-export type Item = Book;
-export type ItemFormData = BookFormData;
+// Aliases for compatibility
+export type Book = Movie;
+export type BookFormData = MovieFormData;
+export type Item = Movie;
+export type ItemFormData = MovieFormData;

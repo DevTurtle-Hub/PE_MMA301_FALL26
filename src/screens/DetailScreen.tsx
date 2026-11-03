@@ -102,7 +102,8 @@ export const DetailScreen: React.FC = () => {
           <BookForm
             initialValues={{
               title: book.title,
-              author: book.author,
+              director: book.director || book.author,
+              author: book.director || book.author,
               genre: book.genre,
               status: book.status,
               rating: book.rating,
@@ -119,7 +120,9 @@ export const DetailScreen: React.FC = () => {
               <View style={styles.titleRow}>
                 <View style={{ flex: 1, marginRight: 8 }}>
                   <Text style={styles.title}>{book.title}</Text>
-                  <Text style={styles.author}>by {book.author}</Text>
+                  <Text style={styles.author}>
+                    by {book.director || book.author}
+                  </Text>
                 </View>
 
                 <View style={styles.rightActionRow}>

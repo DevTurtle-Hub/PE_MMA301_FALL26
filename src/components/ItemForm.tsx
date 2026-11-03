@@ -29,7 +29,9 @@ export const ItemForm: React.FC<ItemFormProps> = ({
   const defaultBtnText = submitButtonText || (isEdit ? 'Save Changes' : `Add ${cfg.entitySingular}`);
 
   const [title, setTitle] = useState(initialValues?.title || '');
-  const [author, setAuthor] = useState(initialValues?.author || '');
+  const [author, setAuthor] = useState(
+    initialValues?.director || initialValues?.author || ''
+  );
   const [genre, setGenre] = useState<string>(initialValues?.genre || '');
   const [status, setStatus] = useState<string>(initialValues?.status || '');
   const [rating, setRating] = useState<string>(
@@ -93,6 +95,7 @@ export const ItemForm: React.FC<ItemFormProps> = ({
     try {
       const payload: BookFormData = {
         title: trimmed1,
+        director: trimmed2,
         author: trimmed2,
         genre: genre as Genre,
         status: status as Status,

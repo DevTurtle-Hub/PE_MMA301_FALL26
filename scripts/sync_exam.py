@@ -12,16 +12,24 @@ if sys.platform == "win32":
 
 def run_cmd(cmd, desc=""):
     print(f"\n[SYNC] >>> {desc} ({cmd})...")
-    result = subprocess.run(cmd, shell=True, text=True, capture_output=True)
+    result = subprocess.run(
+        cmd,
+        shell=True,
+        capture_output=True,
+        encoding="utf-8",
+        errors="replace"
+    )
+    stdout_text = (result.stdout or "").strip()
+    stderr_text = (result.stderr or "").strip()
     if result.returncode == 0:
         print(f"[OK] {desc} succeeded.")
-        if result.stdout.strip():
-            print(result.stdout.strip()[:300])
+        if stdout_text:
+            print(stdout_text[:300])
         return True
     else:
         print(f"[WARN] {desc} exited with code {result.returncode}")
-        if result.stderr.strip():
-            print(result.stderr.strip()[:300])
+        if stderr_text:
+            print(stderr_text[:300])
         return False
 
 def sync_all(student_code="QE190042", deploy_rules=True, push_git=True):

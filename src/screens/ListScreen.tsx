@@ -47,7 +47,7 @@ export const ListScreen: React.FC = () => {
       const matchSearch =
         !cleanSearch ||
         b.title.toLowerCase().includes(cleanSearch) ||
-        b.author.toLowerCase().includes(cleanSearch);
+        (b.director || b.author || '').toLowerCase().includes(cleanSearch);
 
       const matchCategory = selectedCategory === 'All' || b.genre === selectedCategory;
       const matchStatus = selectedStatus === 'All' || b.status === selectedStatus;
@@ -281,7 +281,7 @@ export const ListScreen: React.FC = () => {
                       {item.title}
                     </Text>
                     <Text style={styles.bookAuthor} numberOfLines={1}>
-                      by {item.author}
+                      by {item.director || item.author}
                     </Text>
                   </View>
 

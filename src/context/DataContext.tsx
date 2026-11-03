@@ -12,21 +12,25 @@ import {
   serverTimestamp,
 } from 'firebase/firestore';
 import { db } from '../config/firebaseConfig';
-import { Book, BookFormData } from '../types';
+import { Movie, MovieFormData } from '../types';
 import { useAuth } from './AuthContext';
 import { ENTITY_CONFIG } from '../config/entityConfig';
 
 export interface DataContextType {
-  items: Book[];
-  books: Book[]; // alias for compatibility
+  items: Movie[];
+  movies: Movie[];
+  books: Movie[];
   loading: boolean;
   error: string | null;
-  addItem: (data: BookFormData) => Promise<void>;
-  addBook: (data: BookFormData) => Promise<void>;
-  updateItem: (id: string, data: Partial<BookFormData>) => Promise<void>;
-  updateBook: (id: string, data: Partial<BookFormData>) => Promise<void>;
+  addItem: (data: MovieFormData) => Promise<void>;
+  addMovie: (data: MovieFormData) => Promise<void>;
+  addBook: (data: MovieFormData) => Promise<void>;
+  updateItem: (id: string, data: Partial<MovieFormData>) => Promise<void>;
+  updateMovie: (id: string, data: Partial<MovieFormData>) => Promise<void>;
+  updateBook: (id: string, data: Partial<MovieFormData>) => Promise<void>;
   toggleFavorite: (id: string) => Promise<void>;
   deleteItem: (id: string) => Promise<void>;
+  deleteMovie: (id: string) => Promise<void>;
   deleteBook: (id: string) => Promise<void>;
   clearError: () => void;
 }
@@ -36,7 +40,7 @@ const DataContext = createContext<DataContextType | undefined>(undefined);
 export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const cfg = ENTITY_CONFIG;
   const { user } = useAuth();
-  const [items, setItems] = useState<Book[]>([]);
+  const [items, setItems] = useState<Movie[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -53,17 +57,32 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const unsubscribe = onSnapshot(
       itemsQuery,
       (snapshot) => {
-        const loadedData: Book[] = snapshot.docs.map((d) => ({
-          id: d.id,
-          favorite: false,
-          ...(d.data() as Omit<Book, 'id'>),
-        }));
+        const loadedData: Movie[] = snapshot.docs.map((d) => {
+          const raw = d.data();
+          const directorVal = raw.director || raw.author || '';
+          return {
+            id: d.id,
+            userId: raw.userId || user.uid,
+            favorite: false,
+            title: raw.title || '',
+            director: directorVal,
+            author: directorVal,
+            genre: raw.genre || '',
+            status: raw.status || '',
+            rating: raw.rating,
+            notes: raw.notes,
+            createdAt: raw.createdAt,
+            ...raw,
+          };
+        });
 
-        // Sort alphabetically by primary field (title/name), then secondary field (author/category)
+        // Alphabetical order by title (not case-sensitive; equal titles ordered by director)
         loadedData.sort((a, b) => {
           const titleComparison = a.title.localeCompare(b.title, undefined, { sensitivity: 'base' });
           if (titleComparison !== 0) return titleComparison;
-          return a.author.localeCompare(b.author, undefined, { sensitivity: 'base' });
+          const secA = a.director || a.author || '';
+          const secB = b.director || b.author || '';
+          return secA.localeCompare(secB, undefined, { sensitivity: 'base' });
         });
 
         setItems(loadedData);
@@ -81,7 +100,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
   }, [user, cfg.collectionName]);
 
-  const validateData = (data: Partial<BookFormData>) => {
+  const validateData = (data: Partial<MovieFormData>) => {
     if (data.title !== undefined) {
       const trimmed = data.title.trim();
       if (!trimmed) {
@@ -91,8 +110,9 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
         throw new Error(cfg.field1.maxMessage);
       }
     }
-    if (data.author !== undefined) {
-      const trimmed = data.author.trim();
+    const secVal = data.director !== undefined ? data.director : data.author;
+    if (secVal !== undefined) {
+      const trimmed = secVal.trim();
       if (!trimmed) {
         throw new Error(cfg.field2.requiredMessage);
       }
@@ -118,22 +138,23 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const addItem = async (data: BookFormData) => {
+  const addItem = async (data: MovieFormData) => {
     if (!user) throw new Error('You must be signed in');
     validateData(data);
     setError(null);
 
     const clean1 = data.title.trim();
-    const clean2 = data.author.trim();
+    const clean2 = (data.director !== undefined ? data.director : data.author || '').trim();
 
     // Deterministic docId preventing case-insensitive duplicates
+    // "the same person cannot save the same title + director twice, even if the letter case differs"
     const docId = `${clean1.toLowerCase()}_${clean2.toLowerCase()}`.replace(/\//g, '_');
 
     // 1. Client-side duplicate check
     const isDuplicate = items.some(
       (b) =>
         b.title.trim().toLowerCase() === clean1.toLowerCase() &&
-        b.author.trim().toLowerCase() === clean2.toLowerCase()
+        (b.director || b.author || '').trim().toLowerCase() === clean2.toLowerCase()
     );
     if (isDuplicate) {
       const msg = `Duplicate: "${clean1}" by "${clean2}" is already in your ${cfg.entityPlural}.`;
@@ -175,22 +196,22 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const updateItem = async (id: string, data: Partial<BookFormData>) => {
+  const updateItem = async (id: string, data: Partial<MovieFormData>) => {
     if (!user) throw new Error('You must be signed in');
     validateData(data);
     setError(null);
 
-    // If primary or secondary fields changed, check duplicate with other items
-    if (data.title !== undefined || data.author !== undefined) {
+    const secVal = data.director !== undefined ? data.director : data.author;
+    if (data.title !== undefined || secVal !== undefined) {
       const target = items.find((b) => b.id === id);
       const new1 = (data.title !== undefined ? data.title : target?.title || '').trim().toLowerCase();
-      const new2 = (data.author !== undefined ? data.author : target?.author || '').trim().toLowerCase();
+      const new2 = (secVal !== undefined ? secVal : target?.director || target?.author || '').trim().toLowerCase();
 
       const duplicate = items.find(
         (b) =>
           b.id !== id &&
           b.title.trim().toLowerCase() === new1 &&
-          b.author.trim().toLowerCase() === new2
+          (b.director || b.author || '').trim().toLowerCase() === new2
       );
 
       if (duplicate) {
@@ -205,7 +226,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
 
     if (data.title !== undefined) updatePayload[cfg.field1.key] = data.title.trim();
-    if (data.author !== undefined) updatePayload[cfg.field2.key] = data.author.trim();
+    if (secVal !== undefined) updatePayload[cfg.field2.key] = secVal.trim();
     if (data.genre !== undefined) updatePayload[cfg.category.key] = data.genre;
     if (data.status !== undefined) updatePayload.status = data.status;
     if (data.favorite !== undefined) updatePayload.favorite = data.favorite;
@@ -254,16 +275,20 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const contextValue: DataContextType = {
     items: user ? items : [],
-    books: user ? items : [], // alias
+    movies: user ? items : [],
+    books: user ? items : [],
     loading,
     error,
     addItem,
-    addBook: addItem, // alias
+    addMovie: addItem,
+    addBook: addItem,
     updateItem,
-    updateBook: updateItem, // alias
+    updateMovie: updateItem,
+    updateBook: updateItem,
     toggleFavorite,
     deleteItem,
-    deleteBook: deleteItem, // alias
+    deleteMovie: deleteItem,
+    deleteBook: deleteItem,
     clearError,
   };
 
@@ -282,7 +307,8 @@ export const useData = (): DataContextType => {
   return context;
 };
 
-// Aliases for backward compatibility
+// Backward compatibility aliases
 export const BookProvider = DataProvider;
 export const useBooks = useData;
-
+export const MovieProvider = DataProvider;
+export const useMovies = useData;

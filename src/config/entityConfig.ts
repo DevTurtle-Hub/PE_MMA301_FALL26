@@ -37,7 +37,6 @@ export interface EntityConfig {
   entityPlural: string;
   appName: string;
 
-  // TestID names
   homeTitleTestId: string;
   formTestId: string;
   formSuccessTestId: string;
@@ -49,7 +48,6 @@ export interface EntityConfig {
   countTestId: string;
   favoriteCountTestId: string;
 
-  // Fields
   field1: FieldRule;
   field2: FieldRule;
   category: EnumRule;
@@ -57,60 +55,59 @@ export interface EntityConfig {
   numeric?: NumericRule;
   notes?: NotesRule;
 
-  // Feature cards for Home screen
   featureCards: { title: string; desc: string }[];
 }
 
 export const ENTITY_CONFIG: EntityConfig = {
-  collectionName: 'books',
-  entitySingular: 'book',
-  entityPlural: 'books',
-  appName: 'BookShelf',
+  collectionName: 'movies',
+  entitySingular: 'movie',
+  entityPlural: 'movies',
+  appName: 'CineList',
 
   homeTitleTestId: 'home-title',
-  formTestId: 'book-form',
-  formSuccessTestId: 'book-success',
-  formSuccessText: 'Book added',
-  errorFormTestId: 'error-book',
-  itemTestId: 'book-item',
-  emptyListTestId: 'books-empty',
-  emptyListText: 'No books found',
-  countTestId: 'book-count',
+  formTestId: 'movie-form',
+  formSuccessTestId: 'movie-success',
+  formSuccessText: 'Movie added',
+  errorFormTestId: 'error-movie',
+  itemTestId: 'movie-item',
+  emptyListTestId: 'movies-empty',
+  emptyListText: 'No movies found',
+  countTestId: 'movie-count',
   favoriteCountTestId: 'favorite-count',
 
   field1: {
     key: 'title',
     label: 'Title',
-    placeholder: 'Enter title',
+    placeholder: 'Enter movie title',
     requiredMessage: 'Title is required',
     maxLength: 100,
     maxMessage: 'Title must be at most 100 characters',
   },
   field2: {
-    key: 'author',
-    label: 'Author',
-    placeholder: 'Enter author',
-    requiredMessage: 'Author is required',
+    key: 'director',
+    label: 'Director',
+    placeholder: 'Enter director name',
+    requiredMessage: 'Director is required',
     maxLength: 60,
-    maxMessage: 'Author must be at most 60 characters',
+    maxMessage: 'Director must be at most 60 characters',
   },
   category: {
     key: 'genre',
     label: 'Genre',
     chooseLabel: 'Choose genre',
     emptyMessage: 'Please choose a genre',
-    options: ['Fiction', 'Non-Fiction', 'Academic', 'Other'],
+    options: ['Action', 'Comedy', 'Drama', 'Horror'],
   },
   status: {
     key: 'status',
     label: 'Status',
     chooseLabel: 'Choose status',
     emptyMessage: 'Please choose a status',
-    options: ['To Read', 'Reading', 'Finished'],
+    options: ['Plan to Watch', 'Watching', 'Watched'],
     priorities: {
-      'To Read': 1,
-      Reading: 2,
-      Finished: 3,
+      'Plan to Watch': 1,
+      Watching: 2,
+      Watched: 3,
     },
   },
   numeric: {
@@ -128,17 +125,16 @@ export const ENTITY_CONFIG: EntityConfig = {
   },
   featureCards: [
     {
-      title: '📚 Track your books',
-      desc: 'Add and manage books in your private reading collection with custom notes and star ratings.',
+      title: '🎬 Track what you watch',
+      desc: 'Add and organize movies in your private watchlist with custom director, ratings, and notes.',
     },
     {
       title: '🏷️ Sort by status',
-      desc: 'Organize books seamlessly into To Read, Reading, and Finished states with instant filtering.',
+      desc: 'Easily organize movies into Plan to Watch, Watching, and Watched with instant filtering.',
     },
     {
       title: '⭐ Rate your favorites',
-      desc: 'Star your favorite reads with one tap and filter favorite titles instantly.',
+      desc: 'Star your favorite movies with one tap and filter favorite titles instantly.',
     },
   ],
 };
-
