@@ -32,8 +32,11 @@ service cloud.firestore {
           && (!('createdAt' in request.resource.data) || request.resource.data.createdAt is timestamp);
       }
 
-      // 1. Chỉ người đã đăng nhập được đọc và xóa phim của chính mình
-      allow read, delete: if request.auth != null && resource.data.userId == request.auth.uid;
+      // 1. Chỉ người đã đăng nhập được đọc (get/list) và xóa phim của chính mình
+      // Cho phép kiểm tra tài liệu (get) nếu tài liệu chưa tồn tại (resource == null) hoặc thuộc về chính mình
+      allow get: if request.auth != null && (resource == null || resource.data.userId == request.auth.uid);
+      allow list: if request.auth != null && resource.data.userId == request.auth.uid;
+      allow delete: if request.auth != null && resource.data.userId == request.auth.uid;
       
       // 2. Thêm mới: Chỉ người đã đăng nhập, đúng userId của chính mình và dữ liệu thỏa mãn schema
       allow create: if request.auth != null && isValidMovie();
