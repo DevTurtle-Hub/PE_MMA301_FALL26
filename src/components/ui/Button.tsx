@@ -9,8 +9,9 @@ import {
   StyleProp,
   View,
 } from 'react-native';
+import { THEME } from '../../config/theme';
 
-type ButtonVariant = 'primary' | 'secondary' | 'danger' | 'outline' | 'ghost';
+type ButtonVariant = 'primary' | 'secondary' | 'danger' | 'outline' | 'ghost' | 'accent';
 
 interface ButtonProps {
   title: string;
@@ -37,6 +38,12 @@ export const Button: React.FC<ButtonProps> = ({
 }) => {
   const isActionDisabled = disabled || loading;
 
+  const getLoaderColor = () => {
+    if (variant === 'accent') return THEME.primary;
+    if (variant === 'outline' || variant === 'ghost') return THEME.primary;
+    return THEME.textInverse;
+  };
+
   return (
     <TouchableOpacity
       activeOpacity={0.75}
@@ -51,10 +58,7 @@ export const Button: React.FC<ButtonProps> = ({
       disabled={isActionDisabled}
     >
       {loading ? (
-        <ActivityIndicator
-          size="small"
-          color={variant === 'outline' || variant === 'ghost' ? '#0F172A' : '#FFFFFF'}
-        />
+        <ActivityIndicator size="small" color={getLoaderColor()} />
       ) : (
         <View style={styles.contentRow}>
           {icon ? <View style={styles.iconContainer}>{icon}</View> : null}
@@ -96,25 +100,32 @@ const styles = StyleSheet.create({
   iconContainer: {
     marginRight: 6,
   },
+  // Color 1: Midnight Slate
   primary: {
-    backgroundColor: '#0F172A',
+    backgroundColor: THEME.primary,
     borderWidth: 1,
-    borderColor: '#0F172A',
+    borderColor: THEME.primary,
+  },
+  // Color 2: Cinematic Amber Gold
+  accent: {
+    backgroundColor: THEME.accent,
+    borderWidth: 1,
+    borderColor: THEME.accentDark,
   },
   secondary: {
-    backgroundColor: '#334155',
+    backgroundColor: THEME.primaryLight,
     borderWidth: 1,
-    borderColor: '#334155',
+    borderColor: THEME.primaryLight,
   },
   danger: {
-    backgroundColor: '#991B1B',
+    backgroundColor: THEME.danger,
     borderWidth: 1,
-    borderColor: '#991B1B',
+    borderColor: THEME.danger,
   },
   outline: {
     backgroundColor: 'transparent',
-    borderWidth: 1,
-    borderColor: '#0F172A',
+    borderWidth: 1.2,
+    borderColor: THEME.primary,
   },
   ghost: {
     backgroundColor: 'transparent',
@@ -125,25 +136,28 @@ const styles = StyleSheet.create({
   },
   baseText: {
     fontSize: 13,
-    fontWeight: '600',
+    fontWeight: '700',
     letterSpacing: 0.2,
   },
   textSm: {
     fontSize: 12,
   },
   primaryText: {
-    color: '#FFFFFF',
+    color: THEME.textInverse,
+  },
+  accentText: {
+    color: THEME.primary,
   },
   secondaryText: {
-    color: '#FFFFFF',
+    color: THEME.textInverse,
   },
   dangerText: {
-    color: '#FFFFFF',
+    color: THEME.textInverse,
   },
   outlineText: {
-    color: '#0F172A',
+    color: THEME.primary,
   },
   ghostText: {
-    color: '#334155',
+    color: THEME.textPrimary,
   },
 });

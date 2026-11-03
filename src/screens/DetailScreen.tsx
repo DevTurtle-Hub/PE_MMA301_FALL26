@@ -16,6 +16,7 @@ import { Card, Badge, Button, BadgeVariant } from '../components/ui';
 import { BookForm } from '../components/BookForm';
 import { BookFormData } from '../types';
 import { ENTITY_CONFIG } from '../config/entityConfig';
+import { THEME } from '../config/theme';
 
 export const DetailScreen: React.FC = () => {
   const cfg = ENTITY_CONFIG;
@@ -73,7 +74,7 @@ export const DetailScreen: React.FC = () => {
     return (
       <SafeAreaView style={styles.safeArea}>
         <View style={styles.centerContainer}>
-          <Ionicons name="alert-circle-outline" size={32} color="#64748B" style={{ marginBottom: 8 }} />
+          <Ionicons name="alert-circle-outline" size={32} color={THEME.textSecondary} style={{ marginBottom: 8 }} />
           <Text style={styles.notFoundText}>{cfg.entitySingular} not found or deleted.</Text>
           <Button
             title="Go Back"
@@ -91,14 +92,14 @@ export const DetailScreen: React.FC = () => {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      {/* Compact Header */}
+      {/* Duo-tone Cinema Header */}
       <View style={styles.header}>
         <TouchableOpacity
           onPress={() => navigation.goBack()}
           style={styles.backBtn}
           hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
         >
-          <Ionicons name="arrow-back" size={18} color="#0F172A" />
+          <Ionicons name="arrow-back" size={18} color={THEME.primary} />
           <Text style={styles.backBtnText}>Back</Text>
         </TouchableOpacity>
         <Text style={styles.headerTitle}>
@@ -131,7 +132,7 @@ export const DetailScreen: React.FC = () => {
                 <View style={{ flex: 1, marginRight: 8 }}>
                   <Text style={styles.title}>{book.title}</Text>
                   <View style={styles.directorRow}>
-                    <Ionicons name="person-outline" size={12} color="#64748B" style={{ marginRight: 4 }} />
+                    <Ionicons name="person-outline" size={12} color={THEME.accentDark} style={{ marginRight: 4 }} />
                     <Text style={styles.author}>{book.director || book.author}</Text>
                   </View>
                 </View>
@@ -147,7 +148,7 @@ export const DetailScreen: React.FC = () => {
                     <Ionicons
                       name={book.favorite ? 'star' : 'star-outline'}
                       size={20}
-                      color={book.favorite ? '#0F172A' : '#94A3B8'}
+                      color={book.favorite ? THEME.accent : THEME.textMuted}
                     />
                   </TouchableOpacity>
                 </View>
@@ -157,7 +158,7 @@ export const DetailScreen: React.FC = () => {
 
               <View style={styles.detailRow}>
                 <View style={styles.labelCol}>
-                  <Ionicons name="pricetag-outline" size={12} color="#64748B" style={{ marginRight: 4 }} />
+                  <Ionicons name="pricetag-outline" size={12} color={THEME.accentDark} style={{ marginRight: 4 }} />
                   <Text style={styles.label}>{cfg.category.label}:</Text>
                 </View>
                 <Text style={styles.value}>{book.genre}</Text>
@@ -165,7 +166,7 @@ export const DetailScreen: React.FC = () => {
 
               <View style={styles.detailRow}>
                 <View style={styles.labelCol}>
-                  <Ionicons name="time-outline" size={12} color="#64748B" style={{ marginRight: 4 }} />
+                  <Ionicons name="time-outline" size={12} color={THEME.accentDark} style={{ marginRight: 4 }} />
                   <Text style={styles.label}>{cfg.status.label}:</Text>
                 </View>
                 <Text style={styles.value}>{book.status}</Text>
@@ -174,7 +175,7 @@ export const DetailScreen: React.FC = () => {
               {book.rating !== undefined ? (
                 <View style={styles.detailRow}>
                   <View style={styles.labelCol}>
-                    <Ionicons name="star-outline" size={12} color="#64748B" style={{ marginRight: 4 }} />
+                    <Ionicons name="star" size={12} color={THEME.accent} style={{ marginRight: 4 }} />
                     <Text style={styles.label}>Rating:</Text>
                   </View>
                   <View style={styles.ratingValueRow}>
@@ -183,17 +184,17 @@ export const DetailScreen: React.FC = () => {
                         key={i}
                         name={i < (book.rating || 0) ? 'star' : 'star-outline'}
                         size={12}
-                        color="#0F172A"
+                        color={i < (book.rating || 0) ? THEME.accent : THEME.borderStrong}
                       />
                     ))}
-                    <Text style={styles.value}> ({book.rating}/5)</Text>
+                    <Text style={styles.ratingNumber}> ({book.rating}/5)</Text>
                   </View>
                 </View>
               ) : null}
 
               <View style={styles.detailRow}>
                 <View style={styles.labelCol}>
-                  <Ionicons name="star" size={12} color="#64748B" style={{ marginRight: 4 }} />
+                  <Ionicons name="star" size={12} color={THEME.accent} style={{ marginRight: 4 }} />
                   <Text style={styles.label}>Favorite:</Text>
                 </View>
                 <Text style={styles.value}>{book.favorite ? 'Yes' : 'No'}</Text>
@@ -202,7 +203,7 @@ export const DetailScreen: React.FC = () => {
               {book.notes ? (
                 <View style={styles.notesSection}>
                   <View style={styles.labelCol}>
-                    <Ionicons name="document-text-outline" size={12} color="#64748B" style={{ marginRight: 4 }} />
+                    <Ionicons name="document-text-outline" size={12} color={THEME.accentDark} style={{ marginRight: 4 }} />
                     <Text style={styles.notesLabel}>Notes:</Text>
                   </View>
                   <Text style={styles.notesText}>{book.notes}</Text>
@@ -216,7 +217,7 @@ export const DetailScreen: React.FC = () => {
                 onPress={() => setIsEditing(true)}
                 variant="primary"
                 size="sm"
-                icon={<Ionicons name="create-outline" size={14} color="#FFFFFF" />}
+                icon={<Ionicons name="create-outline" size={14} color={THEME.accent} />}
                 style={styles.actionBtn}
               />
               <Button
@@ -224,7 +225,7 @@ export const DetailScreen: React.FC = () => {
                 onPress={handleDelete}
                 variant="danger"
                 size="sm"
-                icon={<Ionicons name="trash-outline" size={14} color="#FFFFFF" />}
+                icon={<Ionicons name="trash-outline" size={14} color={THEME.textInverse} />}
                 style={styles.actionBtn}
               />
             </View>
@@ -238,7 +239,7 @@ export const DetailScreen: React.FC = () => {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#F8FAFC',
+    backgroundColor: THEME.background,
   },
   header: {
     flexDirection: 'row',
@@ -246,9 +247,9 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 12,
     paddingVertical: 10,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: THEME.card,
     borderBottomWidth: 1,
-    borderBottomColor: '#E2E8F0',
+    borderBottomColor: THEME.border,
   },
   backBtn: {
     flexDirection: 'row',
@@ -257,13 +258,13 @@ const styles = StyleSheet.create({
   },
   backBtnText: {
     fontSize: 13,
-    fontWeight: '600',
-    color: '#0F172A',
+    fontWeight: '700',
+    color: THEME.primary,
   },
   headerTitle: {
     fontSize: 14,
-    fontWeight: '700',
-    color: '#0F172A',
+    fontWeight: '800',
+    color: THEME.primary,
   },
   container: {
     padding: 12,
@@ -271,6 +272,9 @@ const styles = StyleSheet.create({
   },
   mainCard: {
     padding: 14,
+    borderColor: THEME.border,
+    borderLeftWidth: 3,
+    borderLeftColor: THEME.accent,
   },
   titleRow: {
     flexDirection: 'row',
@@ -280,7 +284,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 18,
     fontWeight: '800',
-    color: '#0F172A',
+    color: THEME.primary,
     letterSpacing: -0.2,
   },
   directorRow: {
@@ -290,7 +294,7 @@ const styles = StyleSheet.create({
   },
   author: {
     fontSize: 12,
-    color: '#64748B',
+    color: THEME.textSecondary,
   },
   rightActionRow: {
     flexDirection: 'row',
@@ -302,7 +306,7 @@ const styles = StyleSheet.create({
   },
   divider: {
     height: 1,
-    backgroundColor: '#F1F5F9',
+    backgroundColor: THEME.surfaceSubtle,
     marginVertical: 12,
   },
   detailRow: {
@@ -311,7 +315,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 6,
     borderBottomWidth: 1,
-    borderBottomColor: '#F8FAFC',
+    borderBottomColor: THEME.surfaceSubtle,
   },
   labelCol: {
     flexDirection: 'row',
@@ -320,39 +324,44 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#64748B',
+    color: THEME.textSecondary,
   },
   value: {
     fontSize: 12,
-    color: '#0F172A',
-    fontWeight: '500',
+    color: THEME.primary,
+    fontWeight: '600',
   },
   ratingValueRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 2,
   },
+  ratingNumber: {
+    fontSize: 12,
+    color: THEME.accentDark,
+    fontWeight: '700',
+  },
   notesSection: {
     marginTop: 10,
     paddingTop: 8,
     borderTopWidth: 1,
-    borderTopColor: '#F1F5F9',
+    borderTopColor: THEME.surfaceSubtle,
   },
   notesLabel: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#64748B',
+    color: THEME.textSecondary,
   },
   notesText: {
     fontSize: 12,
-    color: '#334155',
+    color: THEME.primaryLight,
     lineHeight: 18,
     marginTop: 4,
-    backgroundColor: '#F8FAFC',
+    backgroundColor: THEME.surfaceSubtle,
     padding: 8,
     borderRadius: 6,
     borderWidth: 1,
-    borderColor: '#E2E8F0',
+    borderColor: THEME.border,
   },
   actionRow: {
     flexDirection: 'row',
@@ -370,6 +379,6 @@ const styles = StyleSheet.create({
   },
   notFoundText: {
     fontSize: 13,
-    color: '#64748B',
+    color: THEME.textSecondary,
   },
 });

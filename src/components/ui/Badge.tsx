@@ -1,5 +1,6 @@
 import React from 'react';
 import { StyleSheet, Text, View, ViewStyle, StyleProp } from 'react-native';
+import { THEME } from '../../config/theme';
 
 export type BadgeVariant = 'blue' | 'green' | 'yellow' | 'red' | 'purple' | 'gray';
 
@@ -20,57 +21,60 @@ export const Badge: React.FC<BadgeProps> = ({ label, variant = 'gray', style }) 
 const styles = StyleSheet.create({
   badge: {
     paddingHorizontal: 8,
-    paddingVertical: 2,
+    paddingVertical: 2.5,
     borderRadius: 4,
     borderWidth: 1,
     alignSelf: 'flex-start',
   },
   text: {
     fontSize: 11,
-    fontWeight: '600',
+    fontWeight: '700',
     letterSpacing: 0.2,
   },
-  // Sleek minimalist neutral monochrome styling
-  blue: {
-    backgroundColor: '#F1F5F9',
-    borderColor: '#CBD5E1',
-  },
-  blueText: {
-    color: '#1E293B',
-  },
+  // Duo-tone Cinema Palette variants
+  // Completed / Green: Slate base with Amber Gold accent
   green: {
-    backgroundColor: '#F8FAFC',
-    borderColor: '#0F172A',
+    backgroundColor: THEME.primary,
+    borderColor: THEME.accent,
   },
   greenText: {
-    color: '#0F172A',
+    color: THEME.accent,
   },
+  // Watching / Blue: Warm amber tint with amber text
+  blue: {
+    backgroundColor: THEME.accentLight,
+    borderColor: THEME.accent,
+  },
+  blueText: {
+    color: THEME.accentText,
+  },
+  // Plan to Watch / Yellow: Subtle slate with slate text
   yellow: {
-    backgroundColor: '#F8FAFC',
-    borderColor: '#CBD5E1',
+    backgroundColor: THEME.surfaceSubtle,
+    borderColor: THEME.borderStrong,
   },
   yellowText: {
-    color: '#334155',
+    color: THEME.primary,
   },
   red: {
-    backgroundColor: '#FEF2F2',
-    borderColor: '#FECACA',
+    backgroundColor: THEME.dangerBg,
+    borderColor: THEME.dangerBorder,
   },
   redText: {
-    color: '#991B1B',
+    color: THEME.danger,
   },
   purple: {
-    backgroundColor: '#F1F5F9',
-    borderColor: '#CBD5E1',
+    backgroundColor: THEME.accentLight,
+    borderColor: THEME.borderStrong,
   },
   purpleText: {
-    color: '#334155',
+    color: THEME.accentText,
   },
   gray: {
-    backgroundColor: '#F1F5F9',
-    borderColor: '#E2E8F0',
+    backgroundColor: THEME.surfaceSubtle,
+    borderColor: THEME.border,
   },
   grayText: {
-    color: '#475569',
+    color: THEME.textSecondary,
   },
 });

@@ -6,6 +6,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { NavigationProp } from '../navigation/types';
 import { Button, Card } from '../components/ui';
 import { ENTITY_CONFIG } from '../config/entityConfig';
+import { THEME } from '../config/theme';
 
 export const HomeScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp<'Home'>>();
@@ -18,10 +19,12 @@ export const HomeScreen: React.FC = () => {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      {/* Compact Header */}
+      {/* Duo-tone Cinema Header */}
       <View style={styles.header}>
         <View style={styles.headerLeft}>
-          <Ionicons name="film-outline" size={20} color="#0F172A" style={{ marginRight: 6 }} />
+          <View style={styles.logoBadge}>
+            <Ionicons name="film" size={16} color={THEME.accent} />
+          </View>
           <Text style={styles.headerAppName}>{ENTITY_CONFIG.appName}</Text>
         </View>
         <View style={styles.headerBtnGroup}>
@@ -44,8 +47,9 @@ export const HomeScreen: React.FC = () => {
         {/* Cinema Hero Section */}
         <View style={styles.heroSection}>
           <View style={styles.iconCircle}>
-            <Ionicons name="film" size={28} color="#0F172A" />
+            <Ionicons name="film" size={26} color={THEME.accent} />
           </View>
+          {/* Requirement: homeTitleTestId with exact appName text */}
           <Text
             testID={ENTITY_CONFIG.homeTitleTestId}
             accessibilityLabel={ENTITY_CONFIG.homeTitleTestId}
@@ -53,7 +57,10 @@ export const HomeScreen: React.FC = () => {
           >
             {ENTITY_CONFIG.appName}
           </Text>
-          <Text style={styles.subtitle}>Movie Watchlist & Tracking</Text>
+          <View style={styles.taglineBadge}>
+            <Ionicons name="star" size={10} color={THEME.accent} style={{ marginRight: 4 }} />
+            <Text style={styles.taglineText}>Curated Cinema Watchlist</Text>
+          </View>
           <Text style={styles.description}>
             A compact, private cinema collection tracker to organize, filter, rate, and curate your {ENTITY_CONFIG.entityPlural.toLowerCase()} watchlist.
           </Text>
@@ -64,12 +71,13 @@ export const HomeScreen: React.FC = () => {
           {ENTITY_CONFIG.featureCards.map((feat, index) => (
             <Card key={index} style={styles.featureCard}>
               <View style={styles.featureHeaderRow}>
-                <Ionicons
-                  name={featureIcons[index % featureIcons.length]}
-                  size={16}
-                  color="#0F172A"
-                  style={{ marginRight: 8 }}
-                />
+                <View style={styles.featureIconBox}>
+                  <Ionicons
+                    name={featureIcons[index % featureIcons.length]}
+                    size={14}
+                    color={THEME.accentDark}
+                  />
+                </View>
                 <Text style={styles.featureTitle}>{feat.title}</Text>
               </View>
               <Text style={styles.featureDesc}>{feat.desc}</Text>
@@ -83,14 +91,14 @@ export const HomeScreen: React.FC = () => {
             title="Get Started - Sign In"
             onPress={() => navigation.navigate('Login')}
             variant="primary"
-            icon={<Ionicons name="log-in-outline" size={16} color="#FFFFFF" />}
+            icon={<Ionicons name="log-in-outline" size={16} color={THEME.accent} />}
             style={styles.actionBtn}
           />
           <Button
             title="Create an Account"
             onPress={() => navigation.navigate('Register')}
             variant="outline"
-            icon={<Ionicons name="person-add-outline" size={16} color="#0F172A" />}
+            icon={<Ionicons name="person-add-outline" size={16} color={THEME.primary} />}
             style={styles.actionBtn}
           />
         </View>
@@ -102,7 +110,7 @@ export const HomeScreen: React.FC = () => {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#F8FAFC',
+    backgroundColor: THEME.background,
   },
   header: {
     flexDirection: 'row',
@@ -110,18 +118,27 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 14,
     paddingVertical: 10,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: THEME.card,
     borderBottomWidth: 1,
-    borderBottomColor: '#E2E8F0',
+    borderBottomColor: THEME.border,
   },
   headerLeft: {
     flexDirection: 'row',
     alignItems: 'center',
   },
+  logoBadge: {
+    width: 28,
+    height: 28,
+    borderRadius: 6,
+    backgroundColor: THEME.primary,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 8,
+  },
   headerAppName: {
     fontSize: 16,
     fontWeight: '800',
-    color: '#0F172A',
+    color: THEME.primary,
     letterSpacing: -0.2,
   },
   headerBtnGroup: {
@@ -134,39 +151,53 @@ const styles = StyleSheet.create({
   },
   heroSection: {
     alignItems: 'center',
-    paddingVertical: 16,
+    paddingVertical: 14,
     paddingHorizontal: 8,
   },
   iconCircle: {
     width: 52,
     height: 52,
     borderRadius: 26,
-    backgroundColor: '#F1F5F9',
+    backgroundColor: THEME.primary,
     alignItems: 'center',
     justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: '#E2E8F0',
+    borderWidth: 2,
+    borderColor: THEME.accent,
     marginBottom: 10,
+    shadowColor: THEME.accent,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 3,
   },
   title: {
     fontSize: 24,
-    fontWeight: '800',
-    color: '#0F172A',
+    fontWeight: '900',
+    color: THEME.primary,
     textAlign: 'center',
     letterSpacing: -0.3,
   },
-  subtitle: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: '#64748B',
-    textAlign: 'center',
-    marginTop: 2,
+  taglineBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: THEME.surfaceSubtle,
+    borderColor: THEME.borderStrong,
+    borderWidth: 1,
+    paddingHorizontal: 8,
+    paddingVertical: 2.5,
+    borderRadius: 12,
+    marginTop: 4,
+  },
+  taglineText: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: THEME.accentText,
     textTransform: 'uppercase',
-    letterSpacing: 0.6,
+    letterSpacing: 0.5,
   },
   description: {
     fontSize: 13,
-    color: '#475569',
+    color: THEME.textSecondary,
     textAlign: 'center',
     lineHeight: 18,
     marginTop: 8,
@@ -178,22 +209,32 @@ const styles = StyleSheet.create({
   featureCard: {
     padding: 12,
     marginBottom: 8,
+    borderColor: THEME.border,
   },
   featureHeaderRow: {
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 4,
   },
+  featureIconBox: {
+    width: 22,
+    height: 22,
+    borderRadius: 4,
+    backgroundColor: THEME.accentLight,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 8,
+  },
   featureTitle: {
     fontSize: 13,
     fontWeight: '700',
-    color: '#0F172A',
+    color: THEME.primary,
   },
   featureDesc: {
     fontSize: 12,
-    color: '#64748B',
+    color: THEME.textSecondary,
     lineHeight: 17,
-    paddingLeft: 24,
+    paddingLeft: 30,
   },
   actionSection: {
     marginTop: 14,

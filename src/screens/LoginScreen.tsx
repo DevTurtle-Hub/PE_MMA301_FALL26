@@ -15,6 +15,7 @@ import { NavigationProp } from '../navigation/types';
 import { useAuth } from '../context/AuthContext';
 import { Card, Button, Input } from '../components/ui';
 import { ENTITY_CONFIG } from '../config/entityConfig';
+import { THEME } from '../config/theme';
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -83,7 +84,7 @@ export const LoginScreen: React.FC = () => {
               style={styles.backBtn}
               hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
             >
-              <Ionicons name="arrow-back" size={16} color="#0F172A" />
+              <Ionicons name="arrow-back" size={16} color={THEME.primary} />
               <Text style={styles.backBtnText}>Home</Text>
             </TouchableOpacity>
           </View>
@@ -91,7 +92,7 @@ export const LoginScreen: React.FC = () => {
           <Card style={styles.card}>
             <View style={styles.headerBox}>
               <View style={styles.logoBadge}>
-                <Ionicons name="film" size={20} color="#0F172A" />
+                <Ionicons name="film" size={20} color={THEME.accent} />
               </View>
               <Text style={styles.appName}>{ENTITY_CONFIG.appName}</Text>
               <Text style={styles.title}>Sign In</Text>
@@ -101,7 +102,7 @@ export const LoginScreen: React.FC = () => {
             {/* Requirement: error-auth */}
             {authError || contextError ? (
               <View testID="error-auth" accessibilityLabel="error-auth" style={styles.errorAuthBox}>
-                <Ionicons name="alert-circle-outline" size={14} color="#991B1B" style={{ marginRight: 6 }} />
+                <Ionicons name="alert-circle" size={14} color={THEME.danger} style={{ marginRight: 6 }} />
                 <Text style={styles.errorAuthText}>{authError || contextError}</Text>
               </View>
             ) : null}
@@ -122,7 +123,7 @@ export const LoginScreen: React.FC = () => {
               }}
               error={emailError}
               showError={submitted}
-              leftIcon={<Ionicons name="mail-outline" size={14} color="#64748B" />}
+              leftIcon={<Ionicons name="mail-outline" size={14} color={THEME.accentDark} />}
             />
 
             {/* Input Password */}
@@ -144,7 +145,7 @@ export const LoginScreen: React.FC = () => {
               showCharCount
               maxLength={32}
               helperText={`Character count: ${password.length}`}
-              leftIcon={<Ionicons name="lock-closed-outline" size={14} color="#64748B" />}
+              leftIcon={<Ionicons name="lock-closed-outline" size={14} color={THEME.accentDark} />}
             />
 
             <Button
@@ -153,7 +154,7 @@ export const LoginScreen: React.FC = () => {
               loading={submitting || loading}
               variant="primary"
               size="md"
-              icon={<Ionicons name="log-in-outline" size={15} color="#FFFFFF" />}
+              icon={<Ionicons name="log-in-outline" size={15} color={THEME.accent} />}
               style={styles.submitBtn}
             />
 
@@ -173,7 +174,7 @@ export const LoginScreen: React.FC = () => {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#F8FAFC',
+    backgroundColor: THEME.background,
   },
   container: {
     padding: 16,
@@ -191,52 +192,53 @@ const styles = StyleSheet.create({
   },
   backBtnText: {
     fontSize: 12,
-    fontWeight: '600',
-    color: '#0F172A',
+    fontWeight: '700',
+    color: THEME.primary,
   },
   card: {
     padding: 14,
+    borderColor: THEME.border,
   },
   headerBox: {
     alignItems: 'center',
     marginBottom: 12,
   },
   logoBadge: {
-    width: 36,
-    height: 36,
+    width: 38,
+    height: 38,
     borderRadius: 8,
-    backgroundColor: '#F1F5F9',
+    backgroundColor: THEME.primary,
     alignItems: 'center',
     justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: '#E2E8F0',
+    borderWidth: 1.5,
+    borderColor: THEME.accent,
     marginBottom: 6,
   },
   appName: {
     fontSize: 12,
-    fontWeight: '700',
-    color: '#64748B',
+    fontWeight: '800',
+    color: THEME.accentText,
     textTransform: 'uppercase',
     letterSpacing: 0.8,
   },
   title: {
     fontSize: 18,
     fontWeight: '800',
-    color: '#0F172A',
+    color: THEME.primary,
     marginTop: 2,
   },
   subtitle: {
     fontSize: 12,
-    color: '#64748B',
+    color: THEME.textSecondary,
     marginTop: 2,
     textAlign: 'center',
   },
   errorAuthBox: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FEF2F2',
+    backgroundColor: THEME.dangerBg,
     borderWidth: 1,
-    borderColor: '#FECACA',
+    borderColor: THEME.dangerBorder,
     borderRadius: 6,
     paddingVertical: 7,
     paddingHorizontal: 10,
@@ -244,7 +246,7 @@ const styles = StyleSheet.create({
   },
   errorAuthText: {
     flex: 1,
-    color: '#991B1B',
+    color: THEME.danger,
     fontSize: 12,
     fontWeight: '600',
   },
@@ -259,11 +261,11 @@ const styles = StyleSheet.create({
   },
   switchText: {
     fontSize: 12,
-    color: '#64748B',
+    color: THEME.textSecondary,
   },
   linkText: {
     fontSize: 12,
-    color: '#0F172A',
+    color: THEME.accentDark,
     fontWeight: '700',
   },
 });

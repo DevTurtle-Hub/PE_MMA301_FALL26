@@ -8,6 +8,7 @@ import {
   StyleProp,
   ViewStyle,
 } from 'react-native';
+import { THEME } from '../../config/theme';
 
 interface InputProps extends TextInputProps {
   label?: string;
@@ -41,7 +42,7 @@ export const Input: React.FC<InputProps> = ({
         {leftIcon ? <View style={styles.iconBox}>{leftIcon}</View> : null}
         <TextInput
           style={[styles.input, style]}
-          placeholderTextColor="#94A3B8"
+          placeholderTextColor={THEME.textMuted}
           value={value}
           maxLength={maxLength}
           {...rest}
@@ -73,21 +74,21 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#334155',
+    color: THEME.textPrimary,
     marginBottom: 4,
   },
   inputWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#CBD5E1',
+    borderColor: THEME.borderStrong,
     borderRadius: 6,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: THEME.card,
     paddingHorizontal: 10,
   },
   inputWrapperError: {
-    borderColor: '#DC2626',
-    backgroundColor: '#FEF2F2',
+    borderColor: THEME.danger,
+    backgroundColor: THEME.dangerBg,
   },
   iconBox: {
     marginRight: 8,
@@ -96,7 +97,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: 7,
     fontSize: 13,
-    color: '#0F172A',
+    color: THEME.textPrimary,
   },
   footerRow: {
     flexDirection: 'row',
@@ -108,16 +109,17 @@ const styles = StyleSheet.create({
   errorText: {
     flex: 1,
     fontSize: 11,
-    color: '#DC2626',
+    color: THEME.danger,
+    fontWeight: '500',
   },
   helperText: {
     flex: 1,
     fontSize: 11,
-    color: '#64748B',
+    color: THEME.textSecondary,
   },
   charCount: {
     fontSize: 11,
-    color: '#94A3B8',
+    color: THEME.textMuted,
     marginLeft: 8,
   },
 });

@@ -1,6 +1,7 @@
 import React from 'react';
 import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { THEME } from '../../config/theme';
 
 interface RatingPickerProps {
   rating?: number;
@@ -33,7 +34,7 @@ export const RatingPicker: React.FC<RatingPickerProps> = ({
               <Ionicons
                 name={isSelected ? 'star' : 'star-outline'}
                 size={14}
-                color={isSelected ? '#0F172A' : '#64748B'}
+                color={isSelected ? THEME.primary : THEME.textMuted}
               />
               <Text style={[styles.starText, isSelected && styles.starTextSelected]}>
                 {star}
@@ -53,7 +54,7 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#334155',
+    color: THEME.textPrimary,
     marginBottom: 4,
   },
   row: {
@@ -68,21 +69,21 @@ const styles = StyleSheet.create({
     paddingVertical: 5,
     borderRadius: 6,
     borderWidth: 1,
-    borderColor: '#CBD5E1',
-    backgroundColor: '#FFFFFF',
+    borderColor: THEME.borderStrong,
+    backgroundColor: THEME.card,
     gap: 4,
   },
   starBtnSelected: {
-    backgroundColor: '#F1F5F9',
-    borderColor: '#0F172A',
+    backgroundColor: THEME.accent,
+    borderColor: THEME.accentDark,
   },
   starText: {
     fontSize: 12,
-    color: '#64748B',
-    fontWeight: '500',
+    color: THEME.textSecondary,
+    fontWeight: '600',
   },
   starTextSelected: {
-    color: '#0F172A',
-    fontWeight: '700',
+    color: THEME.primary,
+    fontWeight: '800',
   },
 });
