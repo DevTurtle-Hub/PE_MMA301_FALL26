@@ -16,6 +16,7 @@ interface InputProps extends TextInputProps {
   helperText?: string;
   containerStyle?: StyleProp<ViewStyle>;
   showCharCount?: boolean;
+  leftIcon?: React.ReactNode;
 }
 
 export const Input: React.FC<InputProps> = ({
@@ -28,6 +29,7 @@ export const Input: React.FC<InputProps> = ({
   maxLength,
   value,
   style,
+  leftIcon,
   ...rest
 }) => {
   const hasError = !!error && showError;
@@ -35,13 +37,16 @@ export const Input: React.FC<InputProps> = ({
   return (
     <View style={[styles.container, containerStyle]}>
       {label ? <Text style={styles.label}>{label}</Text> : null}
-      <TextInput
-        style={[styles.input, hasError && styles.inputError, style]}
-        placeholderTextColor="#9CA3AF"
-        value={value}
-        maxLength={maxLength}
-        {...rest}
-      />
+      <View style={[styles.inputWrapper, hasError && styles.inputWrapperError]}>
+        {leftIcon ? <View style={styles.iconBox}>{leftIcon}</View> : null}
+        <TextInput
+          style={[styles.input, style]}
+          placeholderTextColor="#94A3B8"
+          value={value}
+          maxLength={maxLength}
+          {...rest}
+        />
+      </View>
       <View style={styles.footerRow}>
         {hasError ? (
           <Text style={styles.errorText}>{error}</Text>
@@ -63,50 +68,56 @@ export const Input: React.FC<InputProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    marginBottom: 14,
+    marginBottom: 10,
   },
   label: {
-    fontSize: 13,
+    fontSize: 12,
     fontWeight: '600',
-    color: '#374151',
-    marginBottom: 6,
+    color: '#334155',
+    marginBottom: 4,
+  },
+  inputWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#CBD5E1',
+    borderRadius: 6,
+    backgroundColor: '#FFFFFF',
+    paddingHorizontal: 10,
+  },
+  inputWrapperError: {
+    borderColor: '#DC2626',
+    backgroundColor: '#FEF2F2',
+  },
+  iconBox: {
+    marginRight: 8,
   },
   input: {
-    backgroundColor: '#FFFFFF',
-    borderWidth: 1.2,
-    borderColor: '#D1D5DB',
-    borderRadius: 8,
-    paddingHorizontal: 14,
-    paddingVertical: 10,
-    fontSize: 15,
-    color: '#111827',
-  },
-  inputError: {
-    borderColor: '#EF4444',
-    backgroundColor: '#FEF2F2',
+    flex: 1,
+    paddingVertical: 7,
+    fontSize: 13,
+    color: '#0F172A',
   },
   footerRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
-    marginTop: 4,
-    minHeight: 18,
+    alignItems: 'flex-start',
+    marginTop: 3,
+    minHeight: 14,
   },
   errorText: {
-    color: '#EF4444',
-    fontSize: 12,
-    fontWeight: '500',
     flex: 1,
+    fontSize: 11,
+    color: '#DC2626',
   },
   helperText: {
-    color: '#6B7280',
-    fontSize: 12,
     flex: 1,
+    fontSize: 11,
+    color: '#64748B',
   },
   charCount: {
     fontSize: 11,
-    color: '#9CA3AF',
+    color: '#94A3B8',
     marginLeft: 8,
   },
 });
-

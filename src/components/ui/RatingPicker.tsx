@@ -1,5 +1,6 @@
 import React from 'react';
 import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 
 interface RatingPickerProps {
   rating?: number;
@@ -14,22 +15,28 @@ export const RatingPicker: React.FC<RatingPickerProps> = ({
   maxStars = 5,
   label,
 }) => {
-  const stars = Array.from({ length: maxStars + 1 }, (_, i) => i);
+  const stars = Array.from({ length: maxStars }, (_, i) => i + 1);
 
   return (
     <View style={styles.container}>
       {label ? <Text style={styles.label}>{label}</Text> : null}
       <View style={styles.row}>
         {stars.map((star) => {
-          const isSelected = rating === star;
+          const isSelected = rating !== undefined && star <= rating;
           return (
             <TouchableOpacity
               key={star}
+              activeOpacity={0.7}
               style={[styles.starBtn, isSelected && styles.starBtnSelected]}
-              onPress={() => onRatingChange(isSelected ? undefined : star)}
+              onPress={() => onRatingChange(rating === star ? undefined : star)}
             >
+              <Ionicons
+                name={isSelected ? 'star' : 'star-outline'}
+                size={14}
+                color={isSelected ? '#0F172A' : '#64748B'}
+              />
               <Text style={[styles.starText, isSelected && styles.starTextSelected]}>
-                {star} ★
+                {star}
               </Text>
             </TouchableOpacity>
           );
@@ -41,39 +48,41 @@ export const RatingPicker: React.FC<RatingPickerProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    marginBottom: 14,
+    marginBottom: 10,
   },
   label: {
-    fontSize: 13,
+    fontSize: 12,
     fontWeight: '600',
-    color: '#374151',
-    marginBottom: 6,
+    color: '#334155',
+    marginBottom: 4,
   },
   row: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 8,
+    gap: 6,
   },
   starBtn: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 8,
+    paddingVertical: 5,
+    borderRadius: 6,
     borderWidth: 1,
-    borderColor: '#D1D5DB',
-    backgroundColor: '#F9FAFB',
+    borderColor: '#CBD5E1',
+    backgroundColor: '#FFFFFF',
+    gap: 4,
   },
   starBtnSelected: {
-    backgroundColor: '#F59E0B',
-    borderColor: '#F59E0B',
+    backgroundColor: '#F1F5F9',
+    borderColor: '#0F172A',
   },
   starText: {
-    fontSize: 13,
-    color: '#4B5563',
+    fontSize: 12,
+    color: '#64748B',
     fontWeight: '500',
   },
   starTextSelected: {
-    color: '#FFFFFF',
+    color: '#0F172A',
     fontWeight: '700',
   },
 });
-

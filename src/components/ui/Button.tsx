@@ -7,9 +7,10 @@ import {
   ViewStyle,
   TextStyle,
   StyleProp,
+  View,
 } from 'react-native';
 
-type ButtonVariant = 'primary' | 'secondary' | 'danger' | 'outline';
+type ButtonVariant = 'primary' | 'secondary' | 'danger' | 'outline' | 'ghost';
 
 interface ButtonProps {
   title: string;
@@ -19,6 +20,8 @@ interface ButtonProps {
   disabled?: boolean;
   style?: StyleProp<ViewStyle>;
   textStyle?: StyleProp<TextStyle>;
+  icon?: React.ReactNode;
+  size?: 'sm' | 'md';
 }
 
 export const Button: React.FC<ButtonProps> = ({
@@ -29,14 +32,17 @@ export const Button: React.FC<ButtonProps> = ({
   disabled = false,
   style,
   textStyle,
+  icon,
+  size = 'md',
 }) => {
   const isActionDisabled = disabled || loading;
 
   return (
     <TouchableOpacity
-      activeOpacity={0.8}
+      activeOpacity={0.75}
       style={[
         styles.base,
+        size === 'sm' ? styles.sizeSm : styles.sizeMd,
         styles[variant],
         isActionDisabled && styles.disabled,
         style,
@@ -47,12 +53,22 @@ export const Button: React.FC<ButtonProps> = ({
       {loading ? (
         <ActivityIndicator
           size="small"
-          color={variant === 'outline' ? '#2563EB' : '#FFFFFF'}
+          color={variant === 'outline' || variant === 'ghost' ? '#0F172A' : '#FFFFFF'}
         />
       ) : (
-        <Text style={[styles.baseText, styles[`${variant}Text`], textStyle]}>
-          {title}
-        </Text>
+        <View style={styles.contentRow}>
+          {icon ? <View style={styles.iconContainer}>{icon}</View> : null}
+          <Text
+            style={[
+              styles.baseText,
+              size === 'sm' && styles.textSm,
+              styles[`${variant}Text`],
+              textStyle,
+            ]}
+          >
+            {title}
+          </Text>
+        </View>
       )}
     </TouchableOpacity>
   );
@@ -60,40 +76,60 @@ export const Button: React.FC<ButtonProps> = ({
 
 const styles = StyleSheet.create({
   base: {
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-    borderRadius: 10,
+    borderRadius: 6,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  sizeSm: {
+    paddingVertical: 6,
+    paddingHorizontal: 10,
+  },
+  sizeMd: {
+    paddingVertical: 9,
+    paddingHorizontal: 14,
+  },
+  contentRow: {
     flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  iconContainer: {
+    marginRight: 6,
   },
   primary: {
-    backgroundColor: '#2563EB',
-    shadowColor: '#2563EB',
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.25,
-    shadowRadius: 5,
-    elevation: 3,
+    backgroundColor: '#0F172A',
+    borderWidth: 1,
+    borderColor: '#0F172A',
   },
   secondary: {
-    backgroundColor: '#4B5563',
+    backgroundColor: '#334155',
+    borderWidth: 1,
+    borderColor: '#334155',
   },
   danger: {
-    backgroundColor: '#EF4444',
+    backgroundColor: '#991B1B',
+    borderWidth: 1,
+    borderColor: '#991B1B',
   },
   outline: {
     backgroundColor: 'transparent',
-    borderWidth: 1.5,
-    borderColor: '#2563EB',
+    borderWidth: 1,
+    borderColor: '#0F172A',
+  },
+  ghost: {
+    backgroundColor: 'transparent',
+    borderWidth: 0,
   },
   disabled: {
-    opacity: 0.6,
-    elevation: 0,
-    shadowOpacity: 0,
+    opacity: 0.45,
   },
   baseText: {
-    fontSize: 15,
+    fontSize: 13,
     fontWeight: '600',
+    letterSpacing: 0.2,
+  },
+  textSm: {
+    fontSize: 12,
   },
   primaryText: {
     color: '#FFFFFF',
@@ -105,7 +141,9 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
   },
   outlineText: {
-    color: '#2563EB',
+    color: '#0F172A',
+  },
+  ghostText: {
+    color: '#334155',
   },
 });
-

@@ -9,7 +9,7 @@ interface BadgeProps {
   style?: StyleProp<ViewStyle>;
 }
 
-export const Badge: React.FC<BadgeProps> = ({ label, variant = 'blue', style }) => {
+export const Badge: React.FC<BadgeProps> = ({ label, variant = 'gray', style }) => {
   return (
     <View style={[styles.badge, styles[variant], style]}>
       <Text style={[styles.text, styles[`${variant}Text`]]}>{label}</Text>
@@ -19,50 +19,58 @@ export const Badge: React.FC<BadgeProps> = ({ label, variant = 'blue', style }) 
 
 const styles = StyleSheet.create({
   badge: {
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 16,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 4,
+    borderWidth: 1,
     alignSelf: 'flex-start',
   },
   text: {
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: '600',
+    letterSpacing: 0.2,
   },
+  // Sleek minimalist neutral monochrome styling
   blue: {
-    backgroundColor: '#DBEAFE',
+    backgroundColor: '#F1F5F9',
+    borderColor: '#CBD5E1',
   },
   blueText: {
-    color: '#1D4ED8',
+    color: '#1E293B',
   },
   green: {
-    backgroundColor: '#D1FAE5',
+    backgroundColor: '#F8FAFC',
+    borderColor: '#0F172A',
   },
   greenText: {
-    color: '#047857',
+    color: '#0F172A',
   },
   yellow: {
-    backgroundColor: '#FEF3C7',
+    backgroundColor: '#F8FAFC',
+    borderColor: '#CBD5E1',
   },
   yellowText: {
-    color: '#B45309',
+    color: '#334155',
   },
   red: {
-    backgroundColor: '#FEE2E2',
+    backgroundColor: '#FEF2F2',
+    borderColor: '#FECACA',
   },
   redText: {
-    color: '#B91C1C',
+    color: '#991B1B',
   },
   purple: {
-    backgroundColor: '#EDE9FE',
+    backgroundColor: '#F1F5F9',
+    borderColor: '#CBD5E1',
   },
   purpleText: {
-    color: '#6D28D9',
+    color: '#334155',
   },
   gray: {
-    backgroundColor: '#F3F4F6',
+    backgroundColor: '#F1F5F9',
+    borderColor: '#E2E8F0',
   },
   grayText: {
-    color: '#4B5563',
+    color: '#475569',
   },
 });
-

@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRoute, useNavigation } from '@react-navigation/native';
+import { Ionicons } from '@expo/vector-icons';
 import { ScreenRouteProp, NavigationProp } from '../navigation/types';
 import { useBooks } from '../context/BookContext';
 import { Card, Badge, Button, BadgeVariant } from '../components/ui';
@@ -29,12 +30,14 @@ export const DetailScreen: React.FC = () => {
 
   const getStatusBadge = (status: string): { label: string; variant: BadgeVariant } => {
     switch (status) {
-      case 'Finished':
-        return { label: 'Finished', variant: 'green' };
-      case 'Reading':
-        return { label: 'Reading', variant: 'blue' };
+      case 'Completed':
+        return { label: 'Completed', variant: 'green' };
+      case 'Watching':
+        return { label: 'Watching', variant: 'blue' };
+      case 'Plan to Watch':
+        return { label: 'Plan to Watch', variant: 'yellow' };
       default:
-        return { label: status, variant: 'yellow' };
+        return { label: status, variant: 'gray' };
     }
   };
 
@@ -70,12 +73,14 @@ export const DetailScreen: React.FC = () => {
     return (
       <SafeAreaView style={styles.safeArea}>
         <View style={styles.centerContainer}>
+          <Ionicons name="alert-circle-outline" size={32} color="#64748B" style={{ marginBottom: 8 }} />
           <Text style={styles.notFoundText}>{cfg.entitySingular} not found or deleted.</Text>
           <Button
             title="Go Back"
             onPress={() => navigation.goBack()}
             variant="outline"
-            style={{ marginTop: 16 }}
+            size="sm"
+            style={{ marginTop: 12 }}
           />
         </View>
       </SafeAreaView>
@@ -86,15 +91,20 @@ export const DetailScreen: React.FC = () => {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      {/* Top Bar */}
+      {/* Compact Header */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
-          <Text style={styles.backBtnText}>← Back</Text>
+        <TouchableOpacity
+          onPress={() => navigation.goBack()}
+          style={styles.backBtn}
+          hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+        >
+          <Ionicons name="arrow-back" size={18} color="#0F172A" />
+          <Text style={styles.backBtnText}>Back</Text>
         </TouchableOpacity>
         <Text style={styles.headerTitle}>
           {isEditing ? `Edit ${cfg.entitySingular}` : `${cfg.entitySingular} Details`}
         </Text>
-        <View style={{ width: 50 }} />
+        <View style={{ width: 40 }} />
       </View>
 
       <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
@@ -120,9 +130,10 @@ export const DetailScreen: React.FC = () => {
               <View style={styles.titleRow}>
                 <View style={{ flex: 1, marginRight: 8 }}>
                   <Text style={styles.title}>{book.title}</Text>
-                  <Text style={styles.author}>
-                    by {book.director || book.author}
-                  </Text>
+                  <View style={styles.directorRow}>
+                    <Ionicons name="person-outline" size={12} color="#64748B" style={{ marginRight: 4 }} />
+                    <Text style={styles.author}>{book.director || book.author}</Text>
+                  </View>
                 </View>
 
                 <View style={styles.rightActionRow}>
@@ -130,11 +141,14 @@ export const DetailScreen: React.FC = () => {
                   {/* Favorite Toggle Button */}
                   <TouchableOpacity
                     style={styles.starBtn}
+                    hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                     onPress={() => book.id && toggleFavorite(book.id)}
                   >
-                    <Text style={[styles.starIcon, book.favorite && styles.starIconActive]}>
-                      {book.favorite ? '★' : '☆'}
-                    </Text>
+                    <Ionicons
+                      name={book.favorite ? 'star' : 'star-outline'}
+                      size={20}
+                      color={book.favorite ? '#0F172A' : '#94A3B8'}
+                    />
                   </TouchableOpacity>
                 </View>
               </View>
@@ -142,32 +156,55 @@ export const DetailScreen: React.FC = () => {
               <View style={styles.divider} />
 
               <View style={styles.detailRow}>
-                <Text style={styles.label}>{cfg.category.label}:</Text>
+                <View style={styles.labelCol}>
+                  <Ionicons name="pricetag-outline" size={12} color="#64748B" style={{ marginRight: 4 }} />
+                  <Text style={styles.label}>{cfg.category.label}:</Text>
+                </View>
                 <Text style={styles.value}>{book.genre}</Text>
               </View>
 
               <View style={styles.detailRow}>
-                <Text style={styles.label}>{cfg.status.label}:</Text>
+                <View style={styles.labelCol}>
+                  <Ionicons name="time-outline" size={12} color="#64748B" style={{ marginRight: 4 }} />
+                  <Text style={styles.label}>{cfg.status.label}:</Text>
+                </View>
                 <Text style={styles.value}>{book.status}</Text>
               </View>
 
               {book.rating !== undefined ? (
                 <View style={styles.detailRow}>
-                  <Text style={styles.label}>Rating:</Text>
-                  <Text style={styles.value}>
-                    {'★'.repeat(book.rating)} ({book.rating}/5)
-                  </Text>
+                  <View style={styles.labelCol}>
+                    <Ionicons name="star-outline" size={12} color="#64748B" style={{ marginRight: 4 }} />
+                    <Text style={styles.label}>Rating:</Text>
+                  </View>
+                  <View style={styles.ratingValueRow}>
+                    {Array.from({ length: 5 }, (_, i) => (
+                      <Ionicons
+                        key={i}
+                        name={i < (book.rating || 0) ? 'star' : 'star-outline'}
+                        size={12}
+                        color="#0F172A"
+                      />
+                    ))}
+                    <Text style={styles.value}> ({book.rating}/5)</Text>
+                  </View>
                 </View>
               ) : null}
 
               <View style={styles.detailRow}>
-                <Text style={styles.label}>Favorite:</Text>
-                <Text style={styles.value}>{book.favorite ? 'Yes ⭐' : 'No'}</Text>
+                <View style={styles.labelCol}>
+                  <Ionicons name="star" size={12} color="#64748B" style={{ marginRight: 4 }} />
+                  <Text style={styles.label}>Favorite:</Text>
+                </View>
+                <Text style={styles.value}>{book.favorite ? 'Yes' : 'No'}</Text>
               </View>
 
               {book.notes ? (
                 <View style={styles.notesSection}>
-                  <Text style={styles.notesLabel}>Notes:</Text>
+                  <View style={styles.labelCol}>
+                    <Ionicons name="document-text-outline" size={12} color="#64748B" style={{ marginRight: 4 }} />
+                    <Text style={styles.notesLabel}>Notes:</Text>
+                  </View>
                   <Text style={styles.notesText}>{book.notes}</Text>
                 </View>
               ) : null}
@@ -175,15 +212,19 @@ export const DetailScreen: React.FC = () => {
 
             <View style={styles.actionRow}>
               <Button
-                title={`Edit ${cfg.entitySingular}`}
+                title={`Edit`}
                 onPress={() => setIsEditing(true)}
                 variant="primary"
+                size="sm"
+                icon={<Ionicons name="create-outline" size={14} color="#FFFFFF" />}
                 style={styles.actionBtn}
               />
               <Button
-                title={`Delete ${cfg.entitySingular}`}
+                title={`Delete`}
                 onPress={handleDelete}
                 variant="danger"
+                size="sm"
+                icon={<Ionicons name="trash-outline" size={14} color="#FFFFFF" />}
                 style={styles.actionBtn}
               />
             </View>
@@ -197,38 +238,39 @@ export const DetailScreen: React.FC = () => {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#F9FAFB',
+    backgroundColor: '#F8FAFC',
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
     backgroundColor: '#FFFFFF',
     borderBottomWidth: 1,
-    borderBottomColor: '#E5E7EB',
+    borderBottomColor: '#E2E8F0',
   },
   backBtn: {
-    paddingVertical: 4,
-    paddingHorizontal: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
   },
   backBtnText: {
-    fontSize: 15,
+    fontSize: 13,
     fontWeight: '600',
-    color: '#2563EB',
+    color: '#0F172A',
   },
   headerTitle: {
-    fontSize: 18,
+    fontSize: 14,
     fontWeight: '700',
-    color: '#111827',
+    color: '#0F172A',
   },
   container: {
-    padding: 16,
-    paddingBottom: 40,
+    padding: 12,
+    paddingBottom: 32,
   },
   mainCard: {
-    padding: 20,
+    padding: 14,
   },
   titleRow: {
     flexDirection: 'row',
@@ -236,14 +278,19 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
   },
   title: {
-    fontSize: 22,
+    fontSize: 18,
     fontWeight: '800',
-    color: '#111827',
+    color: '#0F172A',
+    letterSpacing: -0.2,
+  },
+  directorRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 3,
   },
   author: {
-    fontSize: 15,
-    color: '#4B5563',
-    marginTop: 4,
+    fontSize: 12,
+    color: '#64748B',
   },
   rightActionRow: {
     flexDirection: 'row',
@@ -251,68 +298,78 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   starBtn: {
-    padding: 4,
-  },
-  starIcon: {
-    fontSize: 24,
-    color: '#9CA3AF',
-  },
-  starIconActive: {
-    color: '#F59E0B',
+    padding: 2,
   },
   divider: {
     height: 1,
-    backgroundColor: '#F3F4F6',
-    marginVertical: 16,
+    backgroundColor: '#F1F5F9',
+    marginVertical: 12,
   },
   detailRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    paddingVertical: 8,
+    alignItems: 'center',
+    paddingVertical: 6,
+    borderBottomWidth: 1,
+    borderBottomColor: '#F8FAFC',
+  },
+  labelCol: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   label: {
-    fontSize: 14,
+    fontSize: 12,
     fontWeight: '600',
-    color: '#6B7280',
+    color: '#64748B',
   },
   value: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#1F2937',
+    fontSize: 12,
+    color: '#0F172A',
+    fontWeight: '500',
+  },
+  ratingValueRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 2,
   },
   notesSection: {
-    marginTop: 16,
-    backgroundColor: '#F3F4F6',
-    padding: 12,
-    borderRadius: 8,
+    marginTop: 10,
+    paddingTop: 8,
+    borderTopWidth: 1,
+    borderTopColor: '#F1F5F9',
   },
   notesLabel: {
     fontSize: 12,
-    fontWeight: '700',
-    color: '#4B5563',
-    marginBottom: 4,
+    fontWeight: '600',
+    color: '#64748B',
   },
   notesText: {
-    fontSize: 14,
-    color: '#1F2937',
-    lineHeight: 20,
+    fontSize: 12,
+    color: '#334155',
+    lineHeight: 18,
+    marginTop: 4,
+    backgroundColor: '#F8FAFC',
+    padding: 8,
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
   },
   actionRow: {
     flexDirection: 'row',
-    gap: 12,
-    marginTop: 20,
+    gap: 10,
+    marginTop: 12,
   },
   actionBtn: {
     flex: 1,
   },
   centerContainer: {
     flex: 1,
-    justifyContent: 'center',
     alignItems: 'center',
-    padding: 20,
+    justifyContent: 'center',
+    padding: 24,
   },
   notFoundText: {
-    fontSize: 16,
-    color: '#6B7280',
+    fontSize: 13,
+    color: '#64748B',
   },
 });

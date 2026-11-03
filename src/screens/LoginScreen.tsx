@@ -10,9 +10,11 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
+import { Ionicons } from '@expo/vector-icons';
 import { NavigationProp } from '../navigation/types';
 import { useAuth } from '../context/AuthContext';
 import { Card, Button, Input } from '../components/ui';
+import { ENTITY_CONFIG } from '../config/entityConfig';
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -75,18 +77,36 @@ export const LoginScreen: React.FC = () => {
         style={{ flex: 1 }}
       >
         <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
-          <Card style={styles.card}>
-            <Text style={styles.title}>Welcome Back</Text>
-            <Text style={styles.subtitle}>Sign in with your email and password</Text>
+          <View style={styles.topNavRow}>
+            <TouchableOpacity
+              onPress={() => navigation.navigate('Home')}
+              style={styles.backBtn}
+              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+            >
+              <Ionicons name="arrow-back" size={16} color="#0F172A" />
+              <Text style={styles.backBtnText}>Home</Text>
+            </TouchableOpacity>
+          </View>
 
-            {/* Requirement: "Bị lỗi từ Firebase (sai pass, trùng email): hiển thị ở error-auth" */}
+          <Card style={styles.card}>
+            <View style={styles.headerBox}>
+              <View style={styles.logoBadge}>
+                <Ionicons name="film" size={20} color="#0F172A" />
+              </View>
+              <Text style={styles.appName}>{ENTITY_CONFIG.appName}</Text>
+              <Text style={styles.title}>Sign In</Text>
+              <Text style={styles.subtitle}>Enter your credentials to access your watchlist</Text>
+            </View>
+
+            {/* Requirement: error-auth */}
             {authError || contextError ? (
               <View testID="error-auth" accessibilityLabel="error-auth" style={styles.errorAuthBox}>
+                <Ionicons name="alert-circle-outline" size={14} color="#991B1B" style={{ marginRight: 6 }} />
                 <Text style={styles.errorAuthText}>{authError || contextError}</Text>
               </View>
             ) : null}
 
-            {/* Input Email - Tắt validate mặc định của hệ thống */}
+            {/* Input Email */}
             <Input
               label="Email"
               placeholder="name@example.com"
@@ -102,9 +122,10 @@ export const LoginScreen: React.FC = () => {
               }}
               error={emailError}
               showError={submitted}
+              leftIcon={<Ionicons name="mail-outline" size={14} color="#64748B" />}
             />
 
-            {/* Input Password - Tắt validate mặc định của hệ thống */}
+            {/* Input Password */}
             <Input
               label="Password"
               placeholder="••••••••"
@@ -123,12 +144,16 @@ export const LoginScreen: React.FC = () => {
               showCharCount
               maxLength={32}
               helperText={`Character count: ${password.length}`}
+              leftIcon={<Ionicons name="lock-closed-outline" size={14} color="#64748B" />}
             />
 
             <Button
               title="Sign In"
               onPress={handleLogin}
               loading={submitting || loading}
+              variant="primary"
+              size="md"
+              icon={<Ionicons name="log-in-outline" size={15} color="#FFFFFF" />}
               style={styles.submitBtn}
             />
 
@@ -148,58 +173,97 @@ export const LoginScreen: React.FC = () => {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#F9FAFB',
+    backgroundColor: '#F8FAFC',
   },
   container: {
-    flexGrow: 1,
-    padding: 20,
-    justifyContent: 'center',
+    padding: 16,
+    paddingTop: 8,
+  },
+  topNavRow: {
+    marginBottom: 8,
+  },
+  backBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    alignSelf: 'flex-start',
+    paddingVertical: 4,
+  },
+  backBtnText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#0F172A',
   },
   card: {
-    padding: 24,
+    padding: 14,
   },
-  title: {
-    fontSize: 24,
-    fontWeight: '800',
-    color: '#111827',
-    textAlign: 'center',
+  headerBox: {
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  logoBadge: {
+    width: 36,
+    height: 36,
+    borderRadius: 8,
+    backgroundColor: '#F1F5F9',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
     marginBottom: 6,
   },
+  appName: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#64748B',
+    textTransform: 'uppercase',
+    letterSpacing: 0.8,
+  },
+  title: {
+    fontSize: 18,
+    fontWeight: '800',
+    color: '#0F172A',
+    marginTop: 2,
+  },
   subtitle: {
-    fontSize: 14,
-    color: '#6B7280',
+    fontSize: 12,
+    color: '#64748B',
+    marginTop: 2,
     textAlign: 'center',
-    marginBottom: 20,
   },
   errorAuthBox: {
-    backgroundColor: '#FDE8E8',
-    borderColor: '#F98080',
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FEF2F2',
     borderWidth: 1,
-    padding: 12,
-    borderRadius: 8,
-    marginBottom: 16,
+    borderColor: '#FECACA',
+    borderRadius: 6,
+    paddingVertical: 7,
+    paddingHorizontal: 10,
+    marginBottom: 10,
   },
   errorAuthText: {
-    color: '#9B1C1C',
+    flex: 1,
+    color: '#991B1B',
+    fontSize: 12,
     fontWeight: '600',
-    fontSize: 13,
-    textAlign: 'center',
   },
   submitBtn: {
-    marginTop: 8,
+    marginTop: 6,
+    width: '100%',
   },
   switchRow: {
     flexDirection: 'row',
     justifyContent: 'center',
-    marginTop: 20,
+    marginTop: 12,
   },
   switchText: {
-    color: '#6B7280',
-    fontSize: 14,
+    fontSize: 12,
+    color: '#64748B',
   },
   linkText: {
-    color: '#2563EB',
+    fontSize: 12,
+    color: '#0F172A',
     fontWeight: '700',
-    fontSize: 14,
   },
 });

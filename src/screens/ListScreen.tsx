@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
+import { Ionicons } from '@expo/vector-icons';
 import { NavigationProp } from '../navigation/types';
 import { useAuth } from '../context/AuthContext';
 import { useBooks } from '../context/BookContext';
@@ -57,17 +58,17 @@ export const ListScreen: React.FC = () => {
     });
   }, [books, searchQuery, selectedCategory, selectedStatus, favoritesOnly]);
 
-  // Summary counts
+  // Summary counts (plain integers required)
   const totalCount = filteredBooks.length;
   const favoriteCount = filteredBooks.filter((b) => b.favorite).length;
 
   // Status breakdown:
-  // "one row per status that appears, the status with the most books first (equal counts: To Read, then Reading, then Finished)"
+  // "one row per status that appears, the status with the most movies first"
   const statusBreakdown = useMemo(() => {
     const defaultPriority: Record<string, number> = cfg.status.priorities || {
-      'To Read': 1,
-      Reading: 2,
-      Finished: 3,
+      'Plan to Watch': 1,
+      Watching: 2,
+      Completed: 3,
     };
 
     const counts: Record<string, number> = {};
@@ -92,12 +93,14 @@ export const ListScreen: React.FC = () => {
 
   const getStatusBadge = (status: string): { label: string; variant: BadgeVariant } => {
     switch (status) {
-      case 'Finished':
-        return { label: 'Finished', variant: 'green' };
-      case 'Reading':
-        return { label: 'Reading', variant: 'blue' };
+      case 'Completed':
+        return { label: 'Completed', variant: 'green' };
+      case 'Watching':
+        return { label: 'Watching', variant: 'blue' };
+      case 'Plan to Watch':
+        return { label: 'Plan to Watch', variant: 'yellow' };
       default:
-        return { label: status, variant: 'yellow' };
+        return { label: status, variant: 'gray' };
     }
   };
 
@@ -107,33 +110,44 @@ export const ListScreen: React.FC = () => {
 
   return (
     <SafeAreaView testID="list-screen" accessibilityLabel="list-screen" style={styles.safeArea}>
-      {/* Header: User Email and Logout button */}
+      {/* Compact Cinema Header */}
       <View style={styles.header}>
-        <View style={{ flex: 1, marginRight: 8 }}>
-          <Text style={styles.headerTitle}>{cfg.appName}</Text>
-          <Text style={styles.userEmail} numberOfLines={1}>
-            {user?.email}
-          </Text>
+        <View style={styles.headerLeft}>
+          <View style={styles.logoBadge}>
+            <Ionicons name="film" size={16} color="#0F172A" />
+          </View>
+          <View style={{ marginLeft: 8, flex: 1 }}>
+            <Text style={styles.headerTitle}>{cfg.appName}</Text>
+            <Text style={styles.userEmail} numberOfLines={1}>
+              {user?.email}
+            </Text>
+          </View>
         </View>
         <Button
           title="Logout"
           onPress={logout}
-          variant="danger"
-          style={styles.logoutBtn}
-          textStyle={{ fontSize: 13 }}
+          variant="outline"
+          size="sm"
+          icon={<Ionicons name="log-out-outline" size={14} color="#0F172A" />}
         />
       </View>
 
       <ScrollView contentContainerStyle={styles.scrollContainer} keyboardShouldPersistTaps="handled">
-        {/* Toggle / Add Section */}
+        {/* Toggle Form Row */}
         <View style={styles.formToggleRow}>
-          <Text style={styles.sectionHeaderTitle}>Manage {cfg.entityPlural}</Text>
+          <Text style={styles.sectionHeaderTitle}>Watchlist</Text>
           <Button
-            title={showAddForm ? 'Hide Form' : `+ Add a ${cfg.entitySingular}`}
+            title={showAddForm ? 'Hide Form' : `+ Add ${cfg.entitySingular}`}
             onPress={() => setShowAddForm(!showAddForm)}
             variant={showAddForm ? 'outline' : 'primary'}
-            style={styles.toggleFormBtn}
-            textStyle={{ fontSize: 13 }}
+            size="sm"
+            icon={
+              <Ionicons
+                name={showAddForm ? 'close-outline' : 'add-outline'}
+                size={14}
+                color={showAddForm ? '#0F172A' : '#FFFFFF'}
+              />
+            }
           />
         </View>
 
@@ -142,76 +156,101 @@ export const ListScreen: React.FC = () => {
 
         {/* Section C: Filter, search and summary */}
         <Card style={styles.filterCard}>
-          <Text style={styles.filterCardTitle}>Filters & Search</Text>
+          <View style={styles.filterCardHeader}>
+            <Ionicons name="options-outline" size={14} color="#0F172A" style={{ marginRight: 6 }} />
+            <Text style={styles.filterCardTitle}>Filters & Search</Text>
+          </View>
 
-          {/* Search box */}
-          <TextInput
-            style={styles.searchInput}
-            placeholder={`Search by ${cfg.field1.label.toLowerCase()} or ${cfg.field2.label.toLowerCase()}...`}
-            placeholderTextColor="#9CA3AF"
-            value={searchQuery}
-            autoCapitalize="none"
-            autoCorrect={false}
-            onChangeText={setSearchQuery}
-          />
+          {/* Search box with Icon */}
+          <View style={styles.searchBox}>
+            <Ionicons name="search-outline" size={15} color="#94A3B8" style={{ marginRight: 6 }} />
+            <TextInput
+              style={styles.searchInput}
+              placeholder={`Search title or director...`}
+              placeholderTextColor="#94A3B8"
+              value={searchQuery}
+              autoCapitalize="none"
+              autoCorrect={false}
+              onChangeText={setSearchQuery}
+            />
+            {searchQuery ? (
+              <TouchableOpacity onPress={() => setSearchQuery('')} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+                <Ionicons name="close-circle" size={16} color="#94A3B8" />
+              </TouchableOpacity>
+            ) : null}
+          </View>
 
-          {/* Category filter */}
+          {/* Genre filter chips */}
           <Text style={styles.filterLabel}>{cfg.category.label}:</Text>
           <View style={styles.chipsRow}>
-            {['All', ...cfg.category.options].map((g) => (
-              <TouchableOpacity
-                key={g}
-                style={[styles.filterChip, selectedCategory === g && styles.filterChipActive]}
-                onPress={() => setSelectedCategory(g)}
-              >
-                <Text style={[styles.filterChipText, selectedCategory === g && styles.filterChipTextActive]}>
-                  {g}
-                </Text>
-              </TouchableOpacity>
-            ))}
+            {['All', ...cfg.category.options].map((g) => {
+              const isActive = selectedCategory === g;
+              return (
+                <TouchableOpacity
+                  key={g}
+                  activeOpacity={0.7}
+                  style={[styles.filterChip, isActive && styles.filterChipActive]}
+                  onPress={() => setSelectedCategory(g)}
+                >
+                  <Text style={[styles.filterChipText, isActive && styles.filterChipTextActive]}>
+                    {g}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
           </View>
 
-          {/* Status filter */}
+          {/* Status filter chips */}
           <Text style={styles.filterLabel}>{cfg.status.label}:</Text>
           <View style={styles.chipsRow}>
-            {['All', ...cfg.status.options].map((s) => (
-              <TouchableOpacity
-                key={s}
-                style={[styles.filterChip, selectedStatus === s && styles.filterChipActive]}
-                onPress={() => setSelectedStatus(s)}
-              >
-                <Text style={[styles.filterChipText, selectedStatus === s && styles.filterChipTextActive]}>
-                  {s}
-                </Text>
-              </TouchableOpacity>
-            ))}
+            {['All', ...cfg.status.options].map((s) => {
+              const isActive = selectedStatus === s;
+              return (
+                <TouchableOpacity
+                  key={s}
+                  activeOpacity={0.7}
+                  style={[styles.filterChip, isActive && styles.filterChipActive]}
+                  onPress={() => setSelectedStatus(s)}
+                >
+                  <Text style={[styles.filterChipText, isActive && styles.filterChipTextActive]}>
+                    {s}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
           </View>
 
-          {/* Favorites only switch & Clear button */}
+          {/* Favorites switch & Clear button */}
           <View style={styles.switchRow}>
             <View style={styles.switchContainer}>
+              <Ionicons
+                name={favoritesOnly ? 'star' : 'star-outline'}
+                size={16}
+                color={favoritesOnly ? '#0F172A' : '#64748B'}
+                style={{ marginRight: 6 }}
+              />
               <Switch
                 value={favoritesOnly}
                 onValueChange={setFavoritesOnly}
-                trackColor={{ false: '#D1D5DB', true: '#93C5FD' }}
-                thumbColor={favoritesOnly ? '#2563EB' : '#F3F4F6'}
+                trackColor={{ false: '#E2E8F0', true: '#94A3B8' }}
+                thumbColor={favoritesOnly ? '#0F172A' : '#F1F5F9'}
               />
               <Text style={styles.switchLabel}>Favorites only</Text>
             </View>
 
             <TouchableOpacity style={styles.clearBtn} onPress={handleClearFilters}>
-              <Text style={styles.clearBtnText}>Clear Filters</Text>
+              <Ionicons name="refresh-outline" size={12} color="#475569" style={{ marginRight: 4 }} />
+              <Text style={styles.clearBtnText}>Clear</Text>
             </TouchableOpacity>
           </View>
         </Card>
 
         {/* Summary Card */}
         <Card style={styles.summaryCard}>
-          <Text style={styles.summaryTitle}>Collection Summary</Text>
           <View style={styles.summaryStatsRow}>
             <View style={styles.statBox}>
               <Text style={styles.statLabel}>Total {cfg.entityPlural}</Text>
-              {/* Requirement: countTestId, plain integer */}
+              {/* Requirement: countTestId, MUST be plain integer text */}
               <Text
                 testID={cfg.countTestId}
                 accessibilityLabel={cfg.countTestId}
@@ -221,9 +260,14 @@ export const ListScreen: React.FC = () => {
               </Text>
             </View>
 
+            <View style={styles.statDivider} />
+
             <View style={styles.statBox}>
-              <Text style={styles.statLabel}>Favorites</Text>
-              {/* Requirement: favoriteCountTestId, plain integer */}
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <Ionicons name="star" size={12} color="#0F172A" style={{ marginRight: 4 }} />
+                <Text style={styles.statLabel}>Favorites</Text>
+              </View>
+              {/* Requirement: favoriteCountTestId, MUST be plain integer text */}
               <Text
                 testID={cfg.favoriteCountTestId}
                 accessibilityLabel={cfg.favoriteCountTestId}
@@ -237,23 +281,28 @@ export const ListScreen: React.FC = () => {
           {/* Status breakdown */}
           {statusBreakdown.length > 0 ? (
             <View style={styles.breakdownContainer}>
-              <Text style={styles.breakdownTitle}>Status Breakdown:</Text>
-              {statusBreakdown.map((item) => (
-                <View key={item.status} style={styles.breakdownRow}>
-                  <Text style={styles.breakdownStatusName}>{item.status}</Text>
-                  <Text style={styles.breakdownStatusCount}>{item.count} items</Text>
-                </View>
-              ))}
+              <Text style={styles.breakdownTitle}>Breakdown:</Text>
+              <View style={styles.breakdownChips}>
+                {statusBreakdown.map((item) => (
+                  <View key={item.status} style={styles.breakdownChip}>
+                    <Text style={styles.breakdownStatusName}>{item.status}</Text>
+                    <Text style={styles.breakdownStatusCount}>{item.count}</Text>
+                  </View>
+                ))}
+              </View>
             </View>
           ) : null}
         </Card>
 
         {/* Section B: The List */}
-        <Text style={styles.sectionHeaderTitle}>{cfg.entityPlural} List</Text>
+        <View style={styles.listHeaderRow}>
+          <Text style={styles.listHeaderTitle}>Movies</Text>
+          <Text style={styles.listHeaderCount}>Showing {totalCount}</Text>
+        </View>
 
         {loading && books.length === 0 ? (
           <View style={styles.centerContainer}>
-            <ActivityIndicator size="large" color="#2563EB" />
+            <ActivityIndicator size="small" color="#0F172A" />
           </View>
         ) : filteredBooks.length === 0 ? (
           // Requirement: emptyListTestId with emptyListText
@@ -262,6 +311,7 @@ export const ListScreen: React.FC = () => {
             accessibilityLabel={cfg.emptyListTestId}
             style={styles.emptyContainer}
           >
+            <Ionicons name="film-outline" size={32} color="#94A3B8" style={{ marginBottom: 6 }} />
             <Text style={styles.emptyText}>{cfg.emptyListText}</Text>
           </View>
         ) : (
@@ -272,17 +322,20 @@ export const ListScreen: React.FC = () => {
                 key={item.id}
                 testID={cfg.itemTestId}
                 accessibilityLabel={cfg.itemTestId}
-                style={styles.bookCard}
+                style={styles.movieCard}
                 onPress={() => item.id && navigation.navigate('Detail', { bookId: item.id })}
               >
                 <View style={styles.cardHeader}>
                   <View style={{ flex: 1, marginRight: 8 }}>
-                    <Text style={styles.bookTitle} numberOfLines={1}>
+                    <Text style={styles.movieTitle} numberOfLines={1}>
                       {item.title}
                     </Text>
-                    <Text style={styles.bookAuthor} numberOfLines={1}>
-                      by {item.director || item.author}
-                    </Text>
+                    <View style={styles.directorRow}>
+                      <Ionicons name="person-outline" size={11} color="#64748B" style={{ marginRight: 4 }} />
+                      <Text style={styles.movieDirector} numberOfLines={1}>
+                        {item.director || item.author}
+                      </Text>
+                    </View>
                   </View>
 
                   <View style={styles.actionHeaderRight}>
@@ -290,24 +343,38 @@ export const ListScreen: React.FC = () => {
                     {/* Favorite Star Toggle */}
                     <TouchableOpacity
                       style={styles.starBtn}
+                      hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                       onPress={(e) => {
                         e.stopPropagation();
                         if (item.id) toggleFavorite(item.id);
                       }}
                     >
-                      <Text style={[styles.starIcon, item.favorite && styles.starIconActive]}>
-                        {item.favorite ? '★' : '☆'}
-                      </Text>
+                      <Ionicons
+                        name={item.favorite ? 'star' : 'star-outline'}
+                        size={18}
+                        color={item.favorite ? '#0F172A' : '#94A3B8'}
+                      />
                     </TouchableOpacity>
                   </View>
                 </View>
 
                 <View style={styles.cardFooter}>
-                  <Text style={styles.genreText}>{cfg.category.label}: {item.genre}</Text>
+                  <View style={styles.genreTag}>
+                    <Ionicons name="pricetag-outline" size={10} color="#475569" style={{ marginRight: 3 }} />
+                    <Text style={styles.genreText}>{item.genre}</Text>
+                  </View>
                   {item.rating !== undefined ? (
-                    <Text style={styles.ratingText}>
-                      {'★'.repeat(item.rating)} ({item.rating}/5)
-                    </Text>
+                    <View style={styles.ratingRow}>
+                      {Array.from({ length: 5 }, (_, i) => (
+                        <Ionicons
+                          key={i}
+                          name={i < (item.rating || 0) ? 'star' : 'star-outline'}
+                          size={11}
+                          color="#0F172A"
+                        />
+                      ))}
+                      <Text style={styles.ratingText}>{item.rating}/5</Text>
+                    </View>
                   ) : (
                     <Text style={styles.noRatingText}>No rating</Text>
                   )}
@@ -324,271 +391,318 @@ export const ListScreen: React.FC = () => {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#F9FAFB',
+    backgroundColor: '#F8FAFC',
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
     backgroundColor: '#FFFFFF',
     borderBottomWidth: 1,
-    borderBottomColor: '#E5E7EB',
+    borderBottomColor: '#E2E8F0',
+  },
+  headerLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+  },
+  logoBadge: {
+    width: 28,
+    height: 28,
+    borderRadius: 6,
+    backgroundColor: '#F1F5F9',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
   },
   headerTitle: {
-    fontSize: 20,
+    fontSize: 15,
     fontWeight: '800',
-    color: '#111827',
+    color: '#0F172A',
+    letterSpacing: -0.2,
   },
   userEmail: {
-    fontSize: 12,
-    color: '#6B7280',
-    marginTop: 2,
-  },
-  logoutBtn: {
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-    borderRadius: 8,
+    fontSize: 11,
+    color: '#64748B',
   },
   scrollContainer: {
-    padding: 16,
-    paddingBottom: 40,
+    padding: 12,
+    paddingBottom: 32,
   },
   formToggleRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 12,
+    marginBottom: 8,
   },
   sectionHeaderTitle: {
-    fontSize: 18,
+    fontSize: 15,
     fontWeight: '800',
-    color: '#111827',
-  },
-  toggleFormBtn: {
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-    borderRadius: 8,
+    color: '#0F172A',
   },
   filterCard: {
-    padding: 16,
-    marginBottom: 16,
+    padding: 10,
+    marginBottom: 8,
+  },
+  filterCardHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
   },
   filterCardTitle: {
-    fontSize: 15,
+    fontSize: 13,
     fontWeight: '700',
-    color: '#1F2937',
-    marginBottom: 10,
+    color: '#0F172A',
+  },
+  searchBox: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#CBD5E1',
+    borderRadius: 6,
+    backgroundColor: '#FFFFFF',
+    paddingHorizontal: 8,
+    marginBottom: 8,
   },
   searchInput: {
-    backgroundColor: '#FFFFFF',
-    borderWidth: 1.2,
-    borderColor: '#D1D5DB',
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    fontSize: 14,
-    color: '#111827',
-    marginBottom: 12,
+    flex: 1,
+    paddingVertical: 5,
+    fontSize: 12,
+    color: '#0F172A',
   },
   filterLabel: {
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: '600',
-    color: '#4B5563',
+    color: '#475569',
+    marginTop: 2,
     marginBottom: 4,
   },
   chipsRow: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 6,
-    marginBottom: 10,
+    gap: 4,
+    marginBottom: 6,
   },
   filterChip: {
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 14,
-    backgroundColor: '#E5E7EB',
+    paddingHorizontal: 7,
+    paddingVertical: 3,
+    borderRadius: 4,
+    borderWidth: 1,
+    borderColor: '#CBD5E1',
+    backgroundColor: '#FFFFFF',
   },
   filterChipActive: {
-    backgroundColor: '#2563EB',
+    backgroundColor: '#0F172A',
+    borderColor: '#0F172A',
   },
   filterChipText: {
-    fontSize: 12,
-    color: '#4B5563',
+    fontSize: 11,
+    color: '#475569',
     fontWeight: '500',
   },
   filterChipTextActive: {
     color: '#FFFFFF',
-    fontWeight: '700',
+    fontWeight: '600',
   },
   switchRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginTop: 6,
+    marginTop: 4,
+    paddingTop: 6,
     borderTopWidth: 1,
-    borderTopColor: '#F3F4F6',
-    paddingTop: 10,
+    borderTopColor: '#F1F5F9',
   },
   switchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
   },
   switchLabel: {
-    fontSize: 13,
-    color: '#374151',
+    fontSize: 12,
+    color: '#334155',
+    marginLeft: 6,
     fontWeight: '500',
   },
   clearBtn: {
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 6,
-    backgroundColor: '#F3F4F6',
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 4,
+    backgroundColor: '#F1F5F9',
   },
   clearBtnText: {
-    fontSize: 12,
-    color: '#6B7280',
+    fontSize: 11,
+    color: '#475569',
     fontWeight: '600',
   },
   summaryCard: {
-    padding: 16,
-    marginBottom: 20,
-    backgroundColor: '#EEF2FF',
-    borderColor: '#C7D2FE',
-  },
-  summaryTitle: {
-    fontSize: 15,
-    fontWeight: '700',
-    color: '#312E81',
+    padding: 10,
     marginBottom: 10,
   },
   summaryStatsRow: {
     flexDirection: 'row',
-    gap: 16,
-    marginBottom: 12,
+    alignItems: 'center',
+    justifyContent: 'space-around',
+    paddingVertical: 4,
   },
   statBox: {
-    flex: 1,
-    backgroundColor: '#FFFFFF',
-    padding: 12,
-    borderRadius: 8,
     alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#E0E7FF',
+    flex: 1,
+  },
+  statDivider: {
+    width: 1,
+    height: 28,
+    backgroundColor: '#E2E8F0',
   },
   statLabel: {
-    fontSize: 12,
-    color: '#6B7280',
-    fontWeight: '600',
+    fontSize: 11,
+    color: '#64748B',
+    fontWeight: '500',
   },
   statNumber: {
-    fontSize: 24,
+    fontSize: 18,
     fontWeight: '800',
-    color: '#2563EB',
+    color: '#0F172A',
     marginTop: 2,
   },
   breakdownContainer: {
-    backgroundColor: '#FFFFFF',
-    padding: 12,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#E0E7FF',
+    marginTop: 8,
+    paddingTop: 6,
+    borderTopWidth: 1,
+    borderTopColor: '#F1F5F9',
   },
   breakdownTitle: {
-    fontSize: 12,
-    fontWeight: '700',
-    color: '#4B5563',
-    marginBottom: 6,
+    fontSize: 11,
+    fontWeight: '600',
+    color: '#64748B',
+    marginBottom: 4,
   },
-  breakdownRow: {
+  breakdownChips: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingVertical: 3,
+    flexWrap: 'wrap',
+    gap: 6,
+  },
+  breakdownChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 4,
+    backgroundColor: '#F1F5F9',
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
   },
   breakdownStatusName: {
-    fontSize: 13,
-    color: '#374151',
-    fontWeight: '500',
+    fontSize: 11,
+    color: '#475569',
   },
   breakdownStatusCount: {
-    fontSize: 13,
+    fontSize: 11,
     fontWeight: '700',
-    color: '#1F2937',
+    color: '#0F172A',
+    marginLeft: 4,
   },
-  bookCard: {
-    marginBottom: 12,
+  listHeaderRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  listHeaderTitle: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#0F172A',
+  },
+  listHeaderCount: {
+    fontSize: 11,
+    color: '#64748B',
+  },
+  centerContainer: {
+    padding: 24,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  emptyContainer: {
+    padding: 28,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#FFFFFF',
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+  },
+  emptyText: {
+    fontSize: 13,
+    color: '#64748B',
+    fontWeight: '500',
+  },
+  movieCard: {
+    padding: 10,
+    marginBottom: 8,
   },
   cardHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
   },
-  bookTitle: {
-    fontSize: 17,
-    fontWeight: '700',
-    color: '#111827',
-  },
-  bookAuthor: {
+  movieTitle: {
     fontSize: 14,
-    color: '#4B5563',
+    fontWeight: '700',
+    color: '#0F172A',
+  },
+  directorRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
     marginTop: 2,
+  },
+  movieDirector: {
+    fontSize: 12,
+    color: '#64748B',
   },
   actionHeaderRight: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: 6,
   },
   starBtn: {
-    padding: 4,
-  },
-  starIcon: {
-    fontSize: 22,
-    color: '#9CA3AF',
-  },
-  starIconActive: {
-    color: '#F59E0B',
+    padding: 2,
   },
   cardFooter: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginTop: 10,
+    marginTop: 8,
+    paddingTop: 6,
     borderTopWidth: 1,
-    borderTopColor: '#F3F4F6',
-    paddingTop: 8,
+    borderTopColor: '#F8FAFC',
+  },
+  genreTag: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   genreText: {
-    fontSize: 13,
-    color: '#6B7280',
-    fontStyle: 'italic',
+    fontSize: 11,
+    color: '#475569',
+    fontWeight: '500',
+  },
+  ratingRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 2,
   },
   ratingText: {
-    fontSize: 13,
-    color: '#D97706',
-    fontWeight: '700',
+    fontSize: 11,
+    fontWeight: '600',
+    color: '#0F172A',
+    marginLeft: 3,
   },
   noRatingText: {
-    fontSize: 12,
-    color: '#9CA3AF',
-  },
-  centerContainer: {
-    paddingVertical: 40,
-    alignItems: 'center',
-  },
-  emptyContainer: {
-    padding: 30,
-    alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: '#E5E7EB',
-    marginTop: 10,
-  },
-  emptyText: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#6B7280',
+    fontSize: 11,
+    color: '#94A3B8',
+    fontStyle: 'italic',
   },
 });

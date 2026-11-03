@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   TextInput,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { BookFormData, Genre, Status } from '../types';
 import { Card, Button, Input } from './ui';
 import { ENTITY_CONFIG } from '../config/entityConfig';
@@ -124,25 +125,43 @@ export const ItemForm: React.FC<ItemFormProps> = ({
 
   return (
     <Card testID={cfg.formTestId} accessibilityLabel={cfg.formTestId} style={styles.card}>
-      <Text style={styles.formHeaderTitle}>
-        {isEdit ? `Edit ${cfg.entitySingular}` : `Add a ${cfg.entitySingular}`}
-      </Text>
+      <View style={styles.cardHeaderRow}>
+        <Ionicons
+          name={isEdit ? 'create-outline' : 'film-outline'}
+          size={16}
+          color="#0F172A"
+          style={{ marginRight: 6 }}
+        />
+        <Text style={styles.formHeaderTitle}>
+          {isEdit ? `Edit ${cfg.entitySingular}` : `Add a ${cfg.entitySingular}`}
+        </Text>
+      </View>
 
       {/* Success Banner */}
       {successMessage ? (
-        <View testID={cfg.formSuccessTestId} accessibilityLabel={cfg.formSuccessTestId} style={styles.successBox}>
+        <View
+          testID={cfg.formSuccessTestId}
+          accessibilityLabel={cfg.formSuccessTestId}
+          style={styles.successBox}
+        >
+          <Ionicons name="checkmark-circle-outline" size={15} color="#0F172A" style={{ marginRight: 6 }} />
           <Text style={styles.successText}>{successMessage}</Text>
         </View>
       ) : null}
 
       {/* Error Banner */}
       {formError ? (
-        <View testID={cfg.errorFormTestId} accessibilityLabel={cfg.errorFormTestId} style={styles.errorBox}>
+        <View
+          testID={cfg.errorFormTestId}
+          accessibilityLabel={cfg.errorFormTestId}
+          style={styles.errorBox}
+        >
+          <Ionicons name="alert-circle-outline" size={15} color="#991B1B" style={{ marginRight: 6 }} />
           <Text style={styles.errorText}>{formError}</Text>
         </View>
       ) : null}
 
-      {/* Field 1 */}
+      {/* Field 1: Title */}
       <Input
         label={`${cfg.field1.label} *`}
         placeholder={cfg.field1.placeholder}
@@ -157,9 +176,10 @@ export const ItemForm: React.FC<ItemFormProps> = ({
         error={error1}
         showError={submitted}
         maxLength={cfg.field1.maxLength + 10}
+        leftIcon={<Ionicons name="film-outline" size={14} color="#64748B" />}
       />
 
-      {/* Field 2 */}
+      {/* Field 2: Director */}
       <Input
         label={`${cfg.field2.label} *`}
         placeholder={cfg.field2.placeholder}
@@ -174,9 +194,10 @@ export const ItemForm: React.FC<ItemFormProps> = ({
         error={error2}
         showError={submitted}
         maxLength={cfg.field2.maxLength + 10}
+        leftIcon={<Ionicons name="person-outline" size={14} color="#64748B" />}
       />
 
-      {/* Category Picker */}
+      {/* Category / Genre Picker */}
       <View style={styles.fieldContainer}>
         <Text style={styles.label}>{cfg.category.label} *</Text>
         <View style={styles.optionsRow}>
@@ -185,6 +206,7 @@ export const ItemForm: React.FC<ItemFormProps> = ({
             return (
               <TouchableOpacity
                 key={g}
+                activeOpacity={0.7}
                 style={[
                   styles.optionChip,
                   isSelected && styles.optionChipSelected,
@@ -221,6 +243,7 @@ export const ItemForm: React.FC<ItemFormProps> = ({
             return (
               <TouchableOpacity
                 key={s}
+                activeOpacity={0.7}
                 style={[
                   styles.optionChip,
                   isSelected && styles.optionChipSelected,
@@ -248,11 +271,11 @@ export const ItemForm: React.FC<ItemFormProps> = ({
         {submitted && statError ? <Text style={styles.inlineError}>{statError}</Text> : null}
       </View>
 
-      {/* Numeric Field */}
+      {/* Rating (1-5) */}
       {cfg.numeric ? (
         <Input
           label={cfg.numeric.label}
-          placeholder={`e.g. ${cfg.numeric.max}`}
+          placeholder={`e.g. 1 to ${cfg.numeric.max}`}
           keyboardType="numeric"
           value={rating}
           onChangeText={(val) => {
@@ -262,6 +285,7 @@ export const ItemForm: React.FC<ItemFormProps> = ({
           }}
           error={numError}
           showError={submitted}
+          leftIcon={<Ionicons name="star-outline" size={14} color="#64748B" />}
         />
       ) : null}
 
@@ -271,10 +295,10 @@ export const ItemForm: React.FC<ItemFormProps> = ({
           <Text style={styles.label}>{cfg.notes.label}</Text>
           <TextInput
             style={[styles.textArea, submitted && !!notesError && styles.textAreaError]}
-            placeholder="Personal notes..."
-            placeholderTextColor="#9CA3AF"
+            placeholder="Movie thoughts, review, or watchlist notes..."
+            placeholderTextColor="#94A3B8"
             multiline
-            numberOfLines={3}
+            numberOfLines={2}
             value={notes}
             onChangeText={(val) => {
               setNotes(val);
@@ -302,6 +326,7 @@ export const ItemForm: React.FC<ItemFormProps> = ({
             title="Cancel"
             onPress={onCancel}
             variant="outline"
+            size="sm"
             style={styles.cancelBtn}
             disabled={submitting}
           />
@@ -311,6 +336,8 @@ export const ItemForm: React.FC<ItemFormProps> = ({
           onPress={handleSubmit}
           loading={submitting}
           variant="primary"
+          size="sm"
+          icon={<Ionicons name="checkmark" size={14} color="#FFFFFF" />}
           style={styles.submitBtn}
         />
       </View>
@@ -323,127 +350,132 @@ export const BookForm = ItemForm;
 
 const styles = StyleSheet.create({
   card: {
-    padding: 18,
-    marginBottom: 16,
+    padding: 12,
+    marginBottom: 12,
+  },
+  cardHeaderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 10,
   },
   formHeaderTitle: {
-    fontSize: 18,
-    fontWeight: '800',
-    color: '#111827',
-    marginBottom: 14,
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#0F172A',
   },
   successBox: {
-    backgroundColor: '#DEF7EC',
-    borderColor: '#31C48D',
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#F8FAFC',
+    borderColor: '#0F172A',
     borderWidth: 1,
-    padding: 10,
-    borderRadius: 8,
-    marginBottom: 14,
+    paddingVertical: 7,
+    paddingHorizontal: 10,
+    borderRadius: 6,
+    marginBottom: 10,
   },
   successText: {
-    color: '#03543F',
-    fontWeight: '700',
-    fontSize: 14,
-    textAlign: 'center',
+    color: '#0F172A',
+    fontWeight: '600',
+    fontSize: 12,
   },
   errorBox: {
-    backgroundColor: '#FDE8E8',
-    borderColor: '#F98080',
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FEF2F2',
+    borderColor: '#FECACA',
     borderWidth: 1,
-    padding: 10,
-    borderRadius: 8,
-    marginBottom: 14,
+    paddingVertical: 7,
+    paddingHorizontal: 10,
+    borderRadius: 6,
+    marginBottom: 10,
   },
   errorText: {
-    color: '#9B1C1C',
+    color: '#991B1B',
     fontWeight: '600',
-    fontSize: 13,
-    textAlign: 'center',
+    fontSize: 12,
   },
   fieldContainer: {
-    marginBottom: 14,
+    marginBottom: 10,
   },
   label: {
-    fontSize: 13,
+    fontSize: 12,
     fontWeight: '600',
-    color: '#374151',
-    marginBottom: 6,
+    color: '#334155',
+    marginBottom: 4,
   },
   optionsRow: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 6,
+    gap: 5,
   },
   optionChip: {
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 8,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 5,
     borderWidth: 1,
-    borderColor: '#D1D5DB',
-    backgroundColor: '#F9FAFB',
+    borderColor: '#CBD5E1',
+    backgroundColor: '#FFFFFF',
   },
   optionChipSelected: {
-    backgroundColor: '#2563EB',
-    borderColor: '#2563EB',
+    backgroundColor: '#0F172A',
+    borderColor: '#0F172A',
   },
   optionChipEmpty: {
     borderStyle: 'dashed',
   },
   optionText: {
-    fontSize: 12,
-    color: '#4B5563',
+    fontSize: 11,
+    color: '#475569',
     fontWeight: '500',
   },
   optionTextSelected: {
     color: '#FFFFFF',
-    fontWeight: '700',
+    fontWeight: '600',
   },
   optionTextEmpty: {
-    color: '#6B7280',
-    fontStyle: 'italic',
+    color: '#94A3B8',
   },
   inlineError: {
-    color: '#EF4444',
-    fontSize: 12,
-    fontWeight: '500',
-    marginTop: 4,
+    fontSize: 11,
+    color: '#DC2626',
+    marginTop: 3,
   },
   textArea: {
+    borderWidth: 1,
+    borderColor: '#CBD5E1',
+    borderRadius: 6,
     backgroundColor: '#FFFFFF',
-    borderWidth: 1.2,
-    borderColor: '#D1D5DB',
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    fontSize: 14,
-    color: '#111827',
-    minHeight: 65,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    fontSize: 13,
+    color: '#0F172A',
+    minHeight: 52,
     textAlignVertical: 'top',
   },
   textAreaError: {
-    borderColor: '#EF4444',
+    borderColor: '#DC2626',
     backgroundColor: '#FEF2F2',
   },
   notesFooter: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
-    marginTop: 4,
+    marginTop: 2,
   },
   charCount: {
-    fontSize: 11,
-    color: '#9CA3AF',
+    fontSize: 10,
+    color: '#94A3B8',
   },
   buttonRow: {
     flexDirection: 'row',
-    gap: 10,
-    marginTop: 8,
+    justifyContent: 'flex-end',
+    gap: 8,
+    marginTop: 4,
   },
   cancelBtn: {
-    flex: 1,
+    minWidth: 80,
   },
   submitBtn: {
-    flex: 2,
+    minWidth: 100,
   },
 });
-

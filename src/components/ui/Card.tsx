@@ -19,7 +19,7 @@ export const Card: React.FC<CardProps> = ({
   if (onPress) {
     return (
       <TouchableOpacity
-        activeOpacity={0.8}
+        activeOpacity={0.7}
         onPress={onPress}
         testID={testID}
         accessibilityLabel={accessibilityLabel}
@@ -44,15 +44,15 @@ export const Card: React.FC<CardProps> = ({
 const styles = StyleSheet.create({
   card: {
     backgroundColor: '#FFFFFF',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 12,
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 10,
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderColor: '#E2E8F0',
     shadowColor: '#000000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 6,
-    elevation: 3,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.04,
+    shadowRadius: 2,
+    elevation: 1,
   },
 });
