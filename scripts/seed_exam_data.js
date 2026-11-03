@@ -6,7 +6,6 @@ const {
 } = require('firebase/auth');
 const { 
   getFirestore, 
-  collection, 
   doc, 
   setDoc, 
   serverTimestamp 
@@ -58,23 +57,14 @@ async function getOrCreateUser(email, password) {
   }
 }
 
-async function seedData() {
+async function seedDataForAccount(email, password) {
   console.log('='.repeat(60));
-  console.log('🎬 SEEDING TEST DATA FOR CINELIST EXAM (QE190042)');
+  console.log(`🎬 SEEDING TEST MOVIES FOR: ${email}`);
   console.log('='.repeat(60));
 
-  // 1. Grader Account
-  const graderUser = await getOrCreateUser('grader.qe190042@example.com', 'Test1234!');
+  const targetUser = await getOrCreateUser(email, password);
 
-  // 2. Fresh Empty Account (for Screenshot 16: No movies found)
-  await getOrCreateUser('fresh.qe190042@example.com', 'Test1234!');
-
-  // Re-authenticate as graderUser so auth.currentUser is graderUser
-  await signInWithEmailAndPassword(auth, 'grader.qe190042@example.com', 'Test1234!');
-  console.log(`[AUTH] Switched active session back to grader: grader.qe190042@example.com`);
-
-  // 3. Movies List for Grader Account
-  // Balanced: 6 movies, all 4 genres, all 3 statuses (2 each), 3 favorites, Nolan search test
+  // 6 balanced sample movies
   const sampleMovies = [
     {
       title: 'Inception',
@@ -132,17 +122,17 @@ async function seedData() {
     },
   ];
 
-  console.log(`\n[FIRESTORE] Seeding ${sampleMovies.length} movies for UID: ${graderUser.uid}...`);
+  console.log(`\n[FIRESTORE] Seeding ${sampleMovies.length} movies for UID: ${targetUser.uid}...`);
 
   for (const m of sampleMovies) {
     const clean1 = m.title.trim();
     const clean2 = m.director.trim();
-    const docId = `${graderUser.uid}_${clean1.toLowerCase()}_${clean2.toLowerCase()}`.replace(/[\/\s]/g, '_');
+    const docId = `${targetUser.uid}_${clean1.toLowerCase()}_${clean2.toLowerCase()}`.replace(/[\/\s]/g, '_');
 
     const docRef = doc(db, 'movies', docId);
     await setDoc(docRef, {
       id: docId,
-      userId: graderUser.uid,
+      userId: targetUser.uid,
       title: clean1,
       director: clean2,
       genre: m.genre,
@@ -157,16 +147,16 @@ async function seedData() {
   }
 
   console.log('\n' + '='.repeat(60));
-  console.log('✅ TEST DATA SEEDING COMPLETE!');
+  console.log(`✅ TEST DATA SEEDING COMPLETE FOR ${email}!`);
   console.log('='.repeat(60));
-  console.log('Accounts ready:');
-  console.log(' 1. Test account with 6 movies: grader.qe190042@example.com / Test1234!');
-  console.log(' 2. Fresh account with 0 movies: fresh.qe190042@example.com / Test1234!');
-  console.log('Now you can run the app with "npx expo start" and capture all 16 screenshots easily!');
-  process.exit(0);
 }
 
-seedData().catch(err => {
+const targetEmail = process.argv[2] || 'vanquy0604q@gmail.com';
+const targetPass = process.argv[3] || 'Quy123456@';
+
+seedDataForAccount(targetEmail, targetPass).then(() => {
+  process.exit(0);
+}).catch(err => {
   console.error('\n[FATAL ERROR]', err);
   process.exit(1);
 });
