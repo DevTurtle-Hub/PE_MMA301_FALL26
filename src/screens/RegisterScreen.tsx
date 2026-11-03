@@ -94,9 +94,9 @@ export const RegisterScreen: React.FC = () => {
             <TouchableOpacity
               onPress={() => navigation.navigate('Home')}
               style={styles.backBtn}
-              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
             >
-              <Ionicons name="arrow-back" size={16} color={THEME.primary} />
+              <Ionicons name="arrow-back" size={18} color={THEME.primary} />
               <Text style={styles.backBtnText}>Home</Text>
             </TouchableOpacity>
           </View>
@@ -104,7 +104,7 @@ export const RegisterScreen: React.FC = () => {
           <Card style={styles.card}>
             <View style={styles.headerBox}>
               <View style={styles.logoBadge}>
-                <Ionicons name="film" size={20} color={THEME.accent} />
+                <Ionicons name="film" size={24} color="#FFFFFF" />
               </View>
               <Text style={styles.appName}>{ENTITY_CONFIG.appName}</Text>
               <Text style={styles.title}>Create Account</Text>
@@ -114,7 +114,7 @@ export const RegisterScreen: React.FC = () => {
             {/* Requirement: form-success */}
             {successMessage ? (
               <View testID="form-success" accessibilityLabel="form-success" style={styles.successBox}>
-                <Ionicons name="checkmark-circle" size={14} color={THEME.accentDark} style={{ marginRight: 6 }} />
+                <Ionicons name="checkmark-circle" size={18} color={THEME.success} style={{ marginRight: 8 }} />
                 <Text style={styles.successText}>{successMessage}</Text>
               </View>
             ) : null}
@@ -122,7 +122,7 @@ export const RegisterScreen: React.FC = () => {
             {/* Requirement: error-auth */}
             {authError || contextError ? (
               <View testID="error-auth" accessibilityLabel="error-auth" style={styles.errorAuthBox}>
-                <Ionicons name="alert-circle" size={14} color={THEME.danger} style={{ marginRight: 6 }} />
+                <Ionicons name="alert-circle" size={18} color={THEME.danger} style={{ marginRight: 8 }} />
                 <Text style={styles.errorAuthText}>{authError || contextError}</Text>
               </View>
             ) : null}
@@ -144,7 +144,7 @@ export const RegisterScreen: React.FC = () => {
               }}
               error={emailError}
               showError={submitted}
-              leftIcon={<Ionicons name="mail-outline" size={14} color={THEME.accentDark} />}
+              leftIcon={<Ionicons name="mail-outline" size={18} color={THEME.primary} />}
             />
 
             {/* Input Password */}
@@ -167,7 +167,7 @@ export const RegisterScreen: React.FC = () => {
               showCharCount
               maxLength={32}
               helperText={`Character count: ${password.length}`}
-              leftIcon={<Ionicons name="lock-closed-outline" size={14} color={THEME.accentDark} />}
+              leftIcon={<Ionicons name="lock-closed-outline" size={18} color={THEME.primary} />}
             />
 
             {/* Input Confirm Password */}
@@ -187,7 +187,7 @@ export const RegisterScreen: React.FC = () => {
               }}
               error={confirmError}
               showError={submitted}
-              leftIcon={<Ionicons name="shield-checkmark-outline" size={14} color={THEME.accentDark} />}
+              leftIcon={<Ionicons name="shield-checkmark-outline" size={18} color={THEME.primary} />}
             />
 
             <Button
@@ -196,7 +196,7 @@ export const RegisterScreen: React.FC = () => {
               loading={submitting || loading}
               variant="primary"
               size="md"
-              icon={<Ionicons name="person-add-outline" size={15} color={THEME.accent} />}
+              icon={<Ionicons name="person-add-outline" size={18} color="#FFFFFF" />}
               style={styles.submitBtn}
             />
 
@@ -219,77 +219,80 @@ const styles = StyleSheet.create({
     backgroundColor: THEME.background,
   },
   container: {
-    padding: 16,
-    paddingTop: 8,
+    padding: 18,
+    paddingTop: 10,
   },
   topNavRow: {
-    marginBottom: 8,
+    marginBottom: 10,
   },
   backBtn: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
+    gap: 6,
     alignSelf: 'flex-start',
     paddingVertical: 4,
   },
   backBtnText: {
-    fontSize: 12,
+    fontSize: 14,
     fontWeight: '700',
     color: THEME.primary,
   },
   card: {
-    padding: 14,
-    borderColor: THEME.border,
+    padding: 20,
+    borderRadius: 14,
   },
   headerBox: {
     alignItems: 'center',
-    marginBottom: 12,
+    marginBottom: 16,
   },
   logoBadge: {
-    width: 38,
-    height: 38,
-    borderRadius: 8,
+    width: 48,
+    height: 48,
+    borderRadius: 12,
     backgroundColor: THEME.primary,
     alignItems: 'center',
     justifyContent: 'center',
-    borderWidth: 1.5,
-    borderColor: THEME.accent,
-    marginBottom: 6,
+    marginBottom: 8,
+    shadowColor: THEME.primary,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 3,
   },
   appName: {
-    fontSize: 12,
+    fontSize: 13,
     fontWeight: '800',
-    color: THEME.accentText,
+    color: THEME.primary,
     textTransform: 'uppercase',
     letterSpacing: 0.8,
   },
   title: {
-    fontSize: 18,
-    fontWeight: '800',
-    color: THEME.primary,
+    fontSize: 22,
+    fontWeight: '900',
+    color: THEME.textPrimary,
     marginTop: 2,
   },
   subtitle: {
-    fontSize: 12,
+    fontSize: 13,
     color: THEME.textSecondary,
-    marginTop: 2,
+    marginTop: 3,
     textAlign: 'center',
   },
   successBox: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: THEME.accentLight,
-    borderColor: THEME.accent,
+    backgroundColor: THEME.successBg,
+    borderColor: THEME.successBorder,
     borderWidth: 1,
-    paddingVertical: 7,
-    paddingHorizontal: 10,
-    borderRadius: 6,
-    marginBottom: 10,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+    marginBottom: 14,
   },
   successText: {
-    color: THEME.accentText,
+    color: THEME.success,
     fontWeight: '700',
-    fontSize: 12,
+    fontSize: 13,
   },
   errorAuthBox: {
     flexDirection: 'row',
@@ -297,33 +300,33 @@ const styles = StyleSheet.create({
     backgroundColor: THEME.dangerBg,
     borderWidth: 1,
     borderColor: THEME.dangerBorder,
-    borderRadius: 6,
-    paddingVertical: 7,
-    paddingHorizontal: 10,
-    marginBottom: 10,
+    borderRadius: 8,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    marginBottom: 14,
   },
   errorAuthText: {
     flex: 1,
     color: THEME.danger,
-    fontSize: 12,
+    fontSize: 13,
     fontWeight: '600',
   },
   submitBtn: {
-    marginTop: 6,
+    marginTop: 8,
     width: '100%',
   },
   switchRow: {
     flexDirection: 'row',
     justifyContent: 'center',
-    marginTop: 12,
+    marginTop: 16,
   },
   switchText: {
-    fontSize: 12,
+    fontSize: 14,
     color: THEME.textSecondary,
   },
   linkText: {
-    fontSize: 12,
-    color: THEME.accentDark,
-    fontWeight: '700',
+    fontSize: 14,
+    color: THEME.primary,
+    fontWeight: '800',
   },
 });

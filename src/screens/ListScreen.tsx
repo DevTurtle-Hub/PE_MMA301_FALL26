@@ -69,7 +69,7 @@ export const ListScreen: React.FC = () => {
     const defaultPriority: Record<string, number> = cfg.status.priorities || {
       'Plan to Watch': 1,
       Watching: 2,
-      Completed: 3,
+      Watched: 3,
     };
 
     const counts: Record<string, number> = {};
@@ -94,8 +94,8 @@ export const ListScreen: React.FC = () => {
 
   const getStatusBadge = (status: string): { label: string; variant: BadgeVariant } => {
     switch (status) {
-      case 'Completed':
-        return { label: 'Completed', variant: 'green' };
+      case 'Watched':
+        return { label: 'Watched', variant: 'green' };
       case 'Watching':
         return { label: 'Watching', variant: 'blue' };
       case 'Plan to Watch':
@@ -111,13 +111,13 @@ export const ListScreen: React.FC = () => {
 
   return (
     <SafeAreaView testID="list-screen" accessibilityLabel="list-screen" style={styles.safeArea}>
-      {/* Duo-tone Cinema Header */}
+      {/* Header */}
       <View style={styles.header}>
         <View style={styles.headerLeft}>
           <View style={styles.logoBadge}>
-            <Ionicons name="film" size={16} color={THEME.accent} />
+            <Ionicons name="film" size={20} color="#FFFFFF" />
           </View>
-          <View style={{ marginLeft: 8, flex: 1 }}>
+          <View style={{ marginLeft: 10, flex: 1 }}>
             <Text style={styles.headerTitle}>{cfg.appName}</Text>
             <Text style={styles.userEmail} numberOfLines={1}>
               {user?.email}
@@ -129,7 +129,7 @@ export const ListScreen: React.FC = () => {
           onPress={logout}
           variant="outline"
           size="sm"
-          icon={<Ionicons name="log-out-outline" size={14} color={THEME.primary} />}
+          icon={<Ionicons name="log-out-outline" size={16} color={THEME.primary} />}
         />
       </View>
 
@@ -145,8 +145,8 @@ export const ListScreen: React.FC = () => {
             icon={
               <Ionicons
                 name={showAddForm ? 'close-outline' : 'add-outline'}
-                size={14}
-                color={showAddForm ? THEME.primary : THEME.accent}
+                size={16}
+                color={showAddForm ? THEME.primary : '#FFFFFF'}
               />
             }
           />
@@ -158,13 +158,13 @@ export const ListScreen: React.FC = () => {
         {/* Section C: Filter, search and summary */}
         <Card style={styles.filterCard}>
           <View style={styles.filterCardHeader}>
-            <Ionicons name="options-outline" size={14} color={THEME.accentDark} style={{ marginRight: 6 }} />
+            <Ionicons name="options-outline" size={18} color={THEME.primary} style={{ marginRight: 8 }} />
             <Text style={styles.filterCardTitle}>Filters & Search</Text>
           </View>
 
           {/* Search box with Icon */}
           <View style={styles.searchBox}>
-            <Ionicons name="search-outline" size={15} color={THEME.textMuted} style={{ marginRight: 6 }} />
+            <Ionicons name="search-outline" size={18} color={THEME.primary} style={{ marginRight: 8 }} />
             <TextInput
               style={styles.searchInput}
               placeholder={`Search title or director...`}
@@ -176,7 +176,7 @@ export const ListScreen: React.FC = () => {
             />
             {searchQuery ? (
               <TouchableOpacity onPress={() => setSearchQuery('')} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
-                <Ionicons name="close-circle" size={16} color={THEME.textMuted} />
+                <Ionicons name="close-circle" size={18} color={THEME.textMuted} />
               </TouchableOpacity>
             ) : null}
           </View>
@@ -189,7 +189,7 @@ export const ListScreen: React.FC = () => {
               return (
                 <TouchableOpacity
                   key={g}
-                  activeOpacity={0.7}
+                  activeOpacity={0.75}
                   style={[styles.filterChip, isActive && styles.filterChipActive]}
                   onPress={() => setSelectedCategory(g)}
                 >
@@ -209,7 +209,7 @@ export const ListScreen: React.FC = () => {
               return (
                 <TouchableOpacity
                   key={s}
-                  activeOpacity={0.7}
+                  activeOpacity={0.75}
                   style={[styles.filterChip, isActive && styles.filterChipActive]}
                   onPress={() => setSelectedStatus(s)}
                 >
@@ -226,27 +226,27 @@ export const ListScreen: React.FC = () => {
             <View style={styles.switchContainer}>
               <Ionicons
                 name={favoritesOnly ? 'star' : 'star-outline'}
-                size={16}
-                color={favoritesOnly ? THEME.accent : THEME.textSecondary}
-                style={{ marginRight: 6 }}
+                size={18}
+                color={favoritesOnly ? THEME.accentDark : THEME.textSecondary}
+                style={{ marginRight: 8 }}
               />
               <Switch
                 value={favoritesOnly}
                 onValueChange={setFavoritesOnly}
-                trackColor={{ false: THEME.border, true: THEME.accentLight }}
-                thumbColor={favoritesOnly ? THEME.accent : THEME.surfaceSubtle}
+                trackColor={{ false: THEME.border, true: THEME.primaryBorder }}
+                thumbColor={favoritesOnly ? THEME.primary : '#FFFFFF'}
               />
               <Text style={styles.switchLabel}>Favorites only</Text>
             </View>
 
             <TouchableOpacity style={styles.clearBtn} onPress={handleClearFilters}>
-              <Ionicons name="refresh-outline" size={12} color={THEME.textSecondary} style={{ marginRight: 4 }} />
-              <Text style={styles.clearBtnText}>Clear</Text>
+              <Ionicons name="refresh-outline" size={14} color={THEME.primary} style={{ marginRight: 4 }} />
+              <Text style={styles.clearBtnText}>Clear Filters</Text>
             </TouchableOpacity>
           </View>
         </Card>
 
-        {/* Summary Card (Duo-color Accent) */}
+        {/* Summary Card */}
         <Card style={styles.summaryCard}>
           <View style={styles.summaryStatsRow}>
             <View style={styles.statBox}>
@@ -265,7 +265,7 @@ export const ListScreen: React.FC = () => {
 
             <View style={styles.statBox}>
               <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                <Ionicons name="star" size={12} color={THEME.accent} style={{ marginRight: 4 }} />
+                <Ionicons name="star" size={15} color={THEME.accent} style={{ marginRight: 5 }} />
                 <Text style={styles.statLabel}>Favorites</Text>
               </View>
               {/* Requirement: favoriteCountTestId, MUST be plain integer text */}
@@ -282,11 +282,11 @@ export const ListScreen: React.FC = () => {
           {/* Status breakdown */}
           {statusBreakdown.length > 0 ? (
             <View style={styles.breakdownContainer}>
-              <Text style={styles.breakdownTitle}>Breakdown:</Text>
+              <Text style={styles.breakdownTitle}>Status Breakdown:</Text>
               <View style={styles.breakdownChips}>
                 {statusBreakdown.map((item) => (
                   <View key={item.status} style={styles.breakdownChip}>
-                    <Text style={styles.breakdownStatusName}>{item.status}</Text>
+                    <Text style={styles.breakdownStatusName}>{item.status}:</Text>
                     <Text style={styles.breakdownStatusCount}>{item.count}</Text>
                   </View>
                 ))}
@@ -303,7 +303,7 @@ export const ListScreen: React.FC = () => {
 
         {loading && books.length === 0 ? (
           <View style={styles.centerContainer}>
-            <ActivityIndicator size="small" color={THEME.primary} />
+            <ActivityIndicator size="large" color={THEME.primary} />
           </View>
         ) : filteredBooks.length === 0 ? (
           // Requirement: emptyListTestId with emptyListText
@@ -312,7 +312,7 @@ export const ListScreen: React.FC = () => {
             accessibilityLabel={cfg.emptyListTestId}
             style={styles.emptyContainer}
           >
-            <Ionicons name="film-outline" size={32} color={THEME.textMuted} style={{ marginBottom: 6 }} />
+            <Ionicons name="film-outline" size={40} color={THEME.primary} style={{ marginBottom: 10 }} />
             <Text style={styles.emptyText}>{cfg.emptyListText}</Text>
           </View>
         ) : (
@@ -327,12 +327,12 @@ export const ListScreen: React.FC = () => {
                 onPress={() => item.id && navigation.navigate('Detail', { bookId: item.id })}
               >
                 <View style={styles.cardHeader}>
-                  <View style={{ flex: 1, marginRight: 8 }}>
+                  <View style={{ flex: 1, marginRight: 10 }}>
                     <Text style={styles.movieTitle} numberOfLines={1}>
                       {item.title}
                     </Text>
                     <View style={styles.directorRow}>
-                      <Ionicons name="person-outline" size={11} color={THEME.textSecondary} style={{ marginRight: 4 }} />
+                      <Ionicons name="person-outline" size={13} color={THEME.textSecondary} style={{ marginRight: 5 }} />
                       <Text style={styles.movieDirector} numberOfLines={1}>
                         {item.director || item.author}
                       </Text>
@@ -352,7 +352,7 @@ export const ListScreen: React.FC = () => {
                     >
                       <Ionicons
                         name={item.favorite ? 'star' : 'star-outline'}
-                        size={19}
+                        size={22}
                         color={item.favorite ? THEME.accent : THEME.textMuted}
                       />
                     </TouchableOpacity>
@@ -361,7 +361,7 @@ export const ListScreen: React.FC = () => {
 
                 <View style={styles.cardFooter}>
                   <View style={styles.genreTag}>
-                    <Ionicons name="pricetag-outline" size={10} color={THEME.accentDark} style={{ marginRight: 3 }} />
+                    <Ionicons name="pricetag-outline" size={12} color={THEME.secondary} style={{ marginRight: 4 }} />
                     <Text style={styles.genreText}>{item.genre}</Text>
                   </View>
                   {item.rating !== undefined ? (
@@ -370,7 +370,7 @@ export const ListScreen: React.FC = () => {
                         <Ionicons
                           key={i}
                           name={i < (item.rating || 0) ? 'star' : 'star-outline'}
-                          size={11}
+                          size={14}
                           color={i < (item.rating || 0) ? THEME.accent : THEME.borderStrong}
                         />
                       ))}
@@ -398,8 +398,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 12,
-    paddingVertical: 8,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
     backgroundColor: THEME.card,
     borderBottomWidth: 1,
     borderBottomColor: THEME.border,
@@ -410,110 +410,114 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   logoBadge: {
-    width: 28,
-    height: 28,
-    borderRadius: 6,
+    width: 38,
+    height: 38,
+    borderRadius: 10,
     backgroundColor: THEME.primary,
     alignItems: 'center',
     justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: THEME.accent,
+    shadowColor: THEME.primary,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 3,
   },
   headerTitle: {
-    fontSize: 15,
+    fontSize: 17,
     fontWeight: '800',
-    color: THEME.primary,
-    letterSpacing: -0.2,
+    color: THEME.textPrimary,
+    letterSpacing: -0.3,
   },
   userEmail: {
-    fontSize: 11,
+    fontSize: 12,
     color: THEME.textSecondary,
+    marginTop: 2,
   },
   scrollContainer: {
-    padding: 12,
-    paddingBottom: 32,
+    padding: 16,
+    paddingBottom: 40,
   },
   formToggleRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 8,
+    marginBottom: 12,
   },
   sectionHeaderTitle: {
-    fontSize: 15,
+    fontSize: 18,
     fontWeight: '800',
-    color: THEME.primary,
+    color: THEME.textPrimary,
   },
   filterCard: {
-    padding: 10,
-    marginBottom: 8,
+    padding: 16,
+    marginBottom: 14,
   },
   filterCardHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 8,
+    marginBottom: 10,
   },
   filterCardTitle: {
-    fontSize: 13,
+    fontSize: 15,
     fontWeight: '700',
-    color: THEME.primary,
+    color: THEME.textPrimary,
   },
   searchBox: {
     flexDirection: 'row',
     alignItems: 'center',
-    borderWidth: 1,
+    borderWidth: 1.2,
     borderColor: THEME.borderStrong,
-    borderRadius: 6,
+    borderRadius: 8,
     backgroundColor: THEME.card,
-    paddingHorizontal: 8,
-    marginBottom: 8,
+    paddingHorizontal: 12,
+    marginBottom: 12,
   },
   searchInput: {
     flex: 1,
-    paddingVertical: 5,
-    fontSize: 12,
+    paddingVertical: 9,
+    fontSize: 14,
     color: THEME.textPrimary,
   },
   filterLabel: {
-    fontSize: 11,
-    fontWeight: '600',
+    fontSize: 12,
+    fontWeight: '700',
     color: THEME.textSecondary,
-    marginTop: 2,
-    marginBottom: 4,
+    marginTop: 4,
+    marginBottom: 6,
   },
   chipsRow: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 4,
-    marginBottom: 6,
+    gap: 6,
+    marginBottom: 10,
   },
   filterChip: {
-    paddingHorizontal: 7,
-    paddingVertical: 3,
-    borderRadius: 4,
-    borderWidth: 1,
+    paddingHorizontal: 11,
+    paddingVertical: 6,
+    borderRadius: 8,
+    borderWidth: 1.2,
     borderColor: THEME.borderStrong,
     backgroundColor: THEME.card,
   },
   filterChipActive: {
     backgroundColor: THEME.primary,
-    borderColor: THEME.accent,
+    borderColor: THEME.primaryDark,
   },
   filterChipText: {
-    fontSize: 11,
+    fontSize: 13,
     color: THEME.textSecondary,
-    fontWeight: '500',
+    fontWeight: '600',
   },
   filterChipTextActive: {
-    color: THEME.accent,
+    color: '#FFFFFF',
     fontWeight: '700',
   },
   switchRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginTop: 4,
-    paddingTop: 6,
+    marginTop: 6,
+    paddingTop: 10,
     borderTopWidth: 1,
     borderTopColor: THEME.surfaceSubtle,
   },
@@ -522,36 +526,33 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   switchLabel: {
-    fontSize: 12,
+    fontSize: 13,
     color: THEME.textPrimary,
-    marginLeft: 6,
-    fontWeight: '500',
+    marginLeft: 8,
+    fontWeight: '600',
   },
   clearBtn: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    borderRadius: 4,
-    backgroundColor: THEME.surfaceSubtle,
-    borderWidth: 1,
-    borderColor: THEME.border,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 6,
+    backgroundColor: THEME.primaryLight,
   },
   clearBtnText: {
-    fontSize: 11,
-    color: THEME.textSecondary,
-    fontWeight: '600',
+    fontSize: 12,
+    color: THEME.primary,
+    fontWeight: '700',
   },
   summaryCard: {
-    padding: 10,
-    marginBottom: 10,
-    borderColor: THEME.border,
+    padding: 16,
+    marginBottom: 14,
   },
   summaryStatsRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-around',
-    paddingVertical: 4,
+    paddingVertical: 6,
   },
   statBox: {
     alignItems: 'center',
@@ -559,17 +560,17 @@ const styles = StyleSheet.create({
   },
   statDivider: {
     width: 1,
-    height: 28,
+    height: 36,
     backgroundColor: THEME.border,
   },
   statLabel: {
-    fontSize: 11,
+    fontSize: 13,
     color: THEME.textSecondary,
     fontWeight: '600',
   },
   statNumber: {
-    fontSize: 18,
-    fontWeight: '800',
+    fontSize: 24,
+    fontWeight: '900',
     color: THEME.primary,
     marginTop: 2,
   },
@@ -577,81 +578,82 @@ const styles = StyleSheet.create({
     color: THEME.accentDark,
   },
   breakdownContainer: {
-    marginTop: 8,
-    paddingTop: 6,
+    marginTop: 12,
+    paddingTop: 10,
     borderTopWidth: 1,
     borderTopColor: THEME.surfaceSubtle,
   },
   breakdownTitle: {
-    fontSize: 11,
-    fontWeight: '600',
+    fontSize: 13,
+    fontWeight: '700',
     color: THEME.textSecondary,
-    marginBottom: 4,
+    marginBottom: 6,
   },
   breakdownChips: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 6,
+    gap: 8,
   },
   breakdownChip: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: 4,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 6,
     backgroundColor: THEME.surfaceSubtle,
     borderWidth: 1,
     borderColor: THEME.border,
   },
   breakdownStatusName: {
-    fontSize: 11,
+    fontSize: 12,
     color: THEME.textSecondary,
+    fontWeight: '600',
   },
   breakdownStatusCount: {
-    fontSize: 11,
-    fontWeight: '700',
+    fontSize: 12,
+    fontWeight: '800',
     color: THEME.primary,
-    marginLeft: 4,
+    marginLeft: 5,
   },
   listHeaderRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 8,
+    marginBottom: 10,
   },
   listHeaderTitle: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: THEME.primary,
+    fontSize: 17,
+    fontWeight: '800',
+    color: THEME.textPrimary,
   },
   listHeaderCount: {
-    fontSize: 11,
+    fontSize: 13,
     color: THEME.textSecondary,
   },
   centerContainer: {
-    padding: 24,
+    padding: 32,
     alignItems: 'center',
     justifyContent: 'center',
   },
   emptyContainer: {
-    padding: 28,
+    padding: 36,
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: THEME.card,
-    borderRadius: 8,
+    borderRadius: 12,
     borderWidth: 1,
     borderColor: THEME.border,
   },
   emptyText: {
-    fontSize: 13,
+    fontSize: 15,
     color: THEME.textSecondary,
-    fontWeight: '500',
+    fontWeight: '600',
   },
   movieCard: {
-    padding: 10,
-    marginBottom: 8,
-    borderLeftWidth: 3,
-    borderLeftColor: THEME.accent,
+    padding: 14,
+    marginBottom: 12,
+    borderLeftWidth: 4,
+    borderLeftColor: THEME.primary,
   },
   cardHeader: {
     flexDirection: 'row',
@@ -659,23 +661,23 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
   },
   movieTitle: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: THEME.primary,
+    fontSize: 16,
+    fontWeight: '800',
+    color: THEME.textPrimary,
   },
   directorRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 2,
+    marginTop: 4,
   },
   movieDirector: {
-    fontSize: 12,
+    fontSize: 13,
     color: THEME.textSecondary,
   },
   actionHeaderRight: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
+    gap: 8,
   },
   starBtn: {
     padding: 2,
@@ -684,8 +686,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginTop: 8,
-    paddingTop: 6,
+    marginTop: 10,
+    paddingTop: 8,
     borderTopWidth: 1,
     borderTopColor: THEME.surfaceSubtle,
   },
@@ -694,23 +696,23 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   genreText: {
-    fontSize: 11,
+    fontSize: 12,
     color: THEME.textSecondary,
-    fontWeight: '500',
+    fontWeight: '600',
   },
   ratingRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 2,
+    gap: 3,
   },
   ratingText: {
-    fontSize: 11,
+    fontSize: 12,
     fontWeight: '700',
     color: THEME.accentDark,
-    marginLeft: 3,
+    marginLeft: 4,
   },
   noRatingText: {
-    fontSize: 11,
+    fontSize: 12,
     color: THEME.textMuted,
     fontStyle: 'italic',
   },

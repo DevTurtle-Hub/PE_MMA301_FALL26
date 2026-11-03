@@ -27,14 +27,14 @@ export const RatingPicker: React.FC<RatingPickerProps> = ({
           return (
             <TouchableOpacity
               key={star}
-              activeOpacity={0.7}
+              activeOpacity={0.75}
               style={[styles.starBtn, isSelected && styles.starBtnSelected]}
               onPress={() => onRatingChange(rating === star ? undefined : star)}
             >
               <Ionicons
                 name={isSelected ? 'star' : 'star-outline'}
-                size={14}
-                color={isSelected ? THEME.primary : THEME.textMuted}
+                size={16}
+                color={isSelected ? THEME.accentDark : THEME.textMuted}
               />
               <Text style={[styles.starText, isSelected && styles.starTextSelected]}>
                 {star}
@@ -49,41 +49,41 @@ export const RatingPicker: React.FC<RatingPickerProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    marginBottom: 10,
+    marginBottom: 14,
   },
   label: {
-    fontSize: 12,
-    fontWeight: '600',
+    fontSize: 13,
+    fontWeight: '700',
     color: THEME.textPrimary,
-    marginBottom: 4,
+    marginBottom: 6,
   },
   row: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 6,
+    gap: 8,
   },
   starBtn: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 8,
-    paddingVertical: 5,
-    borderRadius: 6,
-    borderWidth: 1,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 8,
+    borderWidth: 1.2,
     borderColor: THEME.borderStrong,
     backgroundColor: THEME.card,
-    gap: 4,
+    gap: 6,
   },
   starBtnSelected: {
-    backgroundColor: THEME.accent,
-    borderColor: THEME.accentDark,
+    backgroundColor: THEME.accentLight,
+    borderColor: THEME.accent,
   },
   starText: {
-    fontSize: 12,
+    fontSize: 13,
     color: THEME.textSecondary,
     fontWeight: '600',
   },
   starTextSelected: {
-    color: THEME.primary,
+    color: THEME.accentText,
     fontWeight: '800',
   },
 });

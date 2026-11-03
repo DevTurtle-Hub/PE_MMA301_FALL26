@@ -19,11 +19,11 @@ export const HomeScreen: React.FC = () => {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      {/* Duo-tone Cinema Header */}
+      {/* Header */}
       <View style={styles.header}>
         <View style={styles.headerLeft}>
           <View style={styles.logoBadge}>
-            <Ionicons name="film" size={16} color={THEME.accent} />
+            <Ionicons name="film" size={20} color="#FFFFFF" />
           </View>
           <Text style={styles.headerAppName}>{ENTITY_CONFIG.appName}</Text>
         </View>
@@ -47,7 +47,7 @@ export const HomeScreen: React.FC = () => {
         {/* Cinema Hero Section */}
         <View style={styles.heroSection}>
           <View style={styles.iconCircle}>
-            <Ionicons name="film" size={26} color={THEME.accent} />
+            <Ionicons name="film" size={34} color="#FFFFFF" />
           </View>
           {/* Requirement: homeTitleTestId with exact appName text */}
           <Text
@@ -58,11 +58,11 @@ export const HomeScreen: React.FC = () => {
             {ENTITY_CONFIG.appName}
           </Text>
           <View style={styles.taglineBadge}>
-            <Ionicons name="star" size={10} color={THEME.accent} style={{ marginRight: 4 }} />
+            <Ionicons name="sparkles" size={13} color={THEME.primary} style={{ marginRight: 6 }} />
             <Text style={styles.taglineText}>Curated Cinema Watchlist</Text>
           </View>
           <Text style={styles.description}>
-            A compact, private cinema collection tracker to organize, filter, rate, and curate your {ENTITY_CONFIG.entityPlural.toLowerCase()} watchlist.
+            A modern, beautifully crafted cinema watchlist app to track, rate, and organize your favorite movies effortlessly.
           </Text>
         </View>
 
@@ -74,8 +74,8 @@ export const HomeScreen: React.FC = () => {
                 <View style={styles.featureIconBox}>
                   <Ionicons
                     name={featureIcons[index % featureIcons.length]}
-                    size={14}
-                    color={THEME.accentDark}
+                    size={18}
+                    color={THEME.primary}
                   />
                 </View>
                 <Text style={styles.featureTitle}>{feat.title}</Text>
@@ -91,14 +91,16 @@ export const HomeScreen: React.FC = () => {
             title="Get Started - Sign In"
             onPress={() => navigation.navigate('Login')}
             variant="primary"
-            icon={<Ionicons name="log-in-outline" size={16} color={THEME.accent} />}
+            size="md"
+            icon={<Ionicons name="log-in-outline" size={20} color="#FFFFFF" />}
             style={styles.actionBtn}
           />
           <Button
             title="Create an Account"
             onPress={() => navigation.navigate('Register')}
             variant="outline"
-            icon={<Ionicons name="person-add-outline" size={16} color={THEME.primary} />}
+            size="md"
+            icon={<Ionicons name="person-add-outline" size={18} color={THEME.primary} />}
             style={styles.actionBtn}
           />
         </View>
@@ -116,8 +118,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 14,
-    paddingVertical: 10,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
     backgroundColor: THEME.card,
     borderBottomWidth: 1,
     borderBottomColor: THEME.border,
@@ -127,118 +129,123 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   logoBadge: {
-    width: 28,
-    height: 28,
-    borderRadius: 6,
+    width: 36,
+    height: 36,
+    borderRadius: 8,
     backgroundColor: THEME.primary,
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: 8,
-  },
-  headerAppName: {
-    fontSize: 16,
-    fontWeight: '800',
-    color: THEME.primary,
-    letterSpacing: -0.2,
-  },
-  headerBtnGroup: {
-    flexDirection: 'row',
-    gap: 6,
-  },
-  container: {
-    padding: 16,
-    paddingBottom: 32,
-  },
-  heroSection: {
-    alignItems: 'center',
-    paddingVertical: 14,
-    paddingHorizontal: 8,
-  },
-  iconCircle: {
-    width: 52,
-    height: 52,
-    borderRadius: 26,
-    backgroundColor: THEME.primary,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 2,
-    borderColor: THEME.accent,
-    marginBottom: 10,
-    shadowColor: THEME.accent,
+    marginRight: 10,
+    shadowColor: THEME.primary,
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
+    shadowOpacity: 0.3,
     shadowRadius: 4,
     elevation: 3,
   },
-  title: {
-    fontSize: 24,
-    fontWeight: '900',
-    color: THEME.primary,
-    textAlign: 'center',
+  headerAppName: {
+    fontSize: 18,
+    fontWeight: '800',
+    color: THEME.textPrimary,
     letterSpacing: -0.3,
+  },
+  headerBtnGroup: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  container: {
+    padding: 18,
+    paddingBottom: 40,
+  },
+  heroSection: {
+    alignItems: 'center',
+    paddingVertical: 18,
+    paddingHorizontal: 10,
+  },
+  iconCircle: {
+    width: 68,
+    height: 68,
+    borderRadius: 34,
+    backgroundColor: THEME.primary,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 3,
+    borderColor: '#FFFFFF',
+    marginBottom: 12,
+    shadowColor: THEME.primary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.35,
+    shadowRadius: 8,
+    elevation: 5,
+  },
+  title: {
+    fontSize: 30,
+    fontWeight: '900',
+    color: THEME.textPrimary,
+    textAlign: 'center',
+    letterSpacing: -0.5,
   },
   taglineBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: THEME.surfaceSubtle,
-    borderColor: THEME.borderStrong,
+    backgroundColor: THEME.primaryLight,
+    borderColor: THEME.primaryBorder,
     borderWidth: 1,
-    paddingHorizontal: 8,
-    paddingVertical: 2.5,
-    borderRadius: 12,
-    marginTop: 4,
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    borderRadius: 16,
+    marginTop: 6,
   },
   taglineText: {
-    fontSize: 11,
+    fontSize: 12,
     fontWeight: '700',
-    color: THEME.accentText,
+    color: THEME.primaryDark,
     textTransform: 'uppercase',
-    letterSpacing: 0.5,
+    letterSpacing: 0.6,
   },
   description: {
-    fontSize: 13,
+    fontSize: 14,
     color: THEME.textSecondary,
     textAlign: 'center',
-    lineHeight: 18,
-    marginTop: 8,
-    paddingHorizontal: 12,
+    lineHeight: 22,
+    marginTop: 10,
+    paddingHorizontal: 14,
   },
   featuresSection: {
-    marginTop: 10,
+    marginTop: 14,
   },
   featureCard: {
-    padding: 12,
-    marginBottom: 8,
-    borderColor: THEME.border,
+    padding: 16,
+    marginBottom: 12,
+    borderRadius: 12,
   },
   featureHeaderRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 4,
+    marginBottom: 6,
   },
   featureIconBox: {
-    width: 22,
-    height: 22,
-    borderRadius: 4,
-    backgroundColor: THEME.accentLight,
+    width: 32,
+    height: 32,
+    borderRadius: 8,
+    backgroundColor: THEME.primaryLight,
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: 8,
+    marginRight: 10,
   },
   featureTitle: {
-    fontSize: 13,
+    fontSize: 15,
     fontWeight: '700',
-    color: THEME.primary,
+    color: THEME.textPrimary,
   },
   featureDesc: {
-    fontSize: 12,
+    fontSize: 13,
     color: THEME.textSecondary,
-    lineHeight: 17,
-    paddingLeft: 30,
+    lineHeight: 19,
+    paddingLeft: 42,
   },
   actionSection: {
-    marginTop: 14,
-    gap: 8,
+    marginTop: 16,
+    gap: 10,
   },
   actionBtn: {
     width: '100%',

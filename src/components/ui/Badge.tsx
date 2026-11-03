@@ -1,6 +1,5 @@
 import React from 'react';
 import { StyleSheet, Text, View, ViewStyle, StyleProp } from 'react-native';
-import { THEME } from '../../config/theme';
 
 export type BadgeVariant = 'blue' | 'green' | 'yellow' | 'red' | 'purple' | 'gray';
 
@@ -20,61 +19,60 @@ export const Badge: React.FC<BadgeProps> = ({ label, variant = 'gray', style }) 
 
 const styles = StyleSheet.create({
   badge: {
-    paddingHorizontal: 8,
-    paddingVertical: 2.5,
-    borderRadius: 4,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 6,
     borderWidth: 1,
     alignSelf: 'flex-start',
   },
   text: {
-    fontSize: 11,
+    fontSize: 12,
     fontWeight: '700',
-    letterSpacing: 0.2,
+    letterSpacing: 0.3,
   },
-  // Duo-tone Cinema Palette variants
-  // Completed / Green: Slate base with Amber Gold accent
-  green: {
-    backgroundColor: THEME.primary,
-    borderColor: THEME.accent,
-  },
-  greenText: {
-    color: THEME.accent,
-  },
-  // Watching / Blue: Warm amber tint with amber text
+  // Watching: Royal Blue blend
   blue: {
-    backgroundColor: THEME.accentLight,
-    borderColor: THEME.accent,
+    backgroundColor: '#EFF6FF',
+    borderColor: '#BFDBFE',
   },
   blueText: {
-    color: THEME.accentText,
+    color: '#1D4ED8',
   },
-  // Plan to Watch / Yellow: Subtle slate with slate text
+  // Watched: Fresh Emerald
+  green: {
+    backgroundColor: '#ECFDF5',
+    borderColor: '#A7F3D0',
+  },
+  greenText: {
+    color: '#047857',
+  },
+  // Plan to Watch: Soft Amber
   yellow: {
-    backgroundColor: THEME.surfaceSubtle,
-    borderColor: THEME.borderStrong,
+    backgroundColor: '#FEF3C7',
+    borderColor: '#FDE68A',
   },
   yellowText: {
-    color: THEME.primary,
+    color: '#B45309',
   },
   red: {
-    backgroundColor: THEME.dangerBg,
-    borderColor: THEME.dangerBorder,
+    backgroundColor: '#FEF2F2',
+    borderColor: '#FECACA',
   },
   redText: {
-    color: THEME.danger,
+    color: '#DC2626',
   },
   purple: {
-    backgroundColor: THEME.accentLight,
-    borderColor: THEME.borderStrong,
+    backgroundColor: '#F0F9FF',
+    borderColor: '#BAE6FD',
   },
   purpleText: {
-    color: THEME.accentText,
+    color: '#0284C7',
   },
   gray: {
-    backgroundColor: THEME.surfaceSubtle,
-    borderColor: THEME.border,
+    backgroundColor: '#F1F5F9',
+    borderColor: '#E2E8F0',
   },
   grayText: {
-    color: THEME.textSecondary,
+    color: '#475569',
   },
 });

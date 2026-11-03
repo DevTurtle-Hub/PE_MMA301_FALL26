@@ -31,8 +31,8 @@ export const DetailScreen: React.FC = () => {
 
   const getStatusBadge = (status: string): { label: string; variant: BadgeVariant } => {
     switch (status) {
-      case 'Completed':
-        return { label: 'Completed', variant: 'green' };
+      case 'Watched':
+        return { label: 'Watched', variant: 'green' };
       case 'Watching':
         return { label: 'Watching', variant: 'blue' };
       case 'Plan to Watch':
@@ -74,14 +74,14 @@ export const DetailScreen: React.FC = () => {
     return (
       <SafeAreaView style={styles.safeArea}>
         <View style={styles.centerContainer}>
-          <Ionicons name="alert-circle-outline" size={32} color={THEME.textSecondary} style={{ marginBottom: 8 }} />
+          <Ionicons name="alert-circle-outline" size={40} color={THEME.textSecondary} style={{ marginBottom: 10 }} />
           <Text style={styles.notFoundText}>{cfg.entitySingular} not found or deleted.</Text>
           <Button
             title="Go Back"
             onPress={() => navigation.goBack()}
             variant="outline"
-            size="sm"
-            style={{ marginTop: 12 }}
+            size="md"
+            style={{ marginTop: 16 }}
           />
         </View>
       </SafeAreaView>
@@ -92,20 +92,20 @@ export const DetailScreen: React.FC = () => {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      {/* Duo-tone Cinema Header */}
+      {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity
           onPress={() => navigation.goBack()}
           style={styles.backBtn}
-          hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
         >
-          <Ionicons name="arrow-back" size={18} color={THEME.primary} />
+          <Ionicons name="arrow-back" size={20} color={THEME.primary} />
           <Text style={styles.backBtnText}>Back</Text>
         </TouchableOpacity>
         <Text style={styles.headerTitle}>
           {isEditing ? `Edit ${cfg.entitySingular}` : `${cfg.entitySingular} Details`}
         </Text>
-        <View style={{ width: 40 }} />
+        <View style={{ width: 44 }} />
       </View>
 
       <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
@@ -129,10 +129,10 @@ export const DetailScreen: React.FC = () => {
           <>
             <Card style={styles.mainCard}>
               <View style={styles.titleRow}>
-                <View style={{ flex: 1, marginRight: 8 }}>
+                <View style={{ flex: 1, marginRight: 12 }}>
                   <Text style={styles.title}>{book.title}</Text>
                   <View style={styles.directorRow}>
-                    <Ionicons name="person-outline" size={12} color={THEME.accentDark} style={{ marginRight: 4 }} />
+                    <Ionicons name="person-outline" size={14} color={THEME.primary} style={{ marginRight: 6 }} />
                     <Text style={styles.author}>{book.director || book.author}</Text>
                   </View>
                 </View>
@@ -142,12 +142,12 @@ export const DetailScreen: React.FC = () => {
                   {/* Favorite Toggle Button */}
                   <TouchableOpacity
                     style={styles.starBtn}
-                    hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                    hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
                     onPress={() => book.id && toggleFavorite(book.id)}
                   >
                     <Ionicons
                       name={book.favorite ? 'star' : 'star-outline'}
-                      size={20}
+                      size={24}
                       color={book.favorite ? THEME.accent : THEME.textMuted}
                     />
                   </TouchableOpacity>
@@ -158,7 +158,7 @@ export const DetailScreen: React.FC = () => {
 
               <View style={styles.detailRow}>
                 <View style={styles.labelCol}>
-                  <Ionicons name="pricetag-outline" size={12} color={THEME.accentDark} style={{ marginRight: 4 }} />
+                  <Ionicons name="pricetag-outline" size={15} color={THEME.primary} style={{ marginRight: 6 }} />
                   <Text style={styles.label}>{cfg.category.label}:</Text>
                 </View>
                 <Text style={styles.value}>{book.genre}</Text>
@@ -166,7 +166,7 @@ export const DetailScreen: React.FC = () => {
 
               <View style={styles.detailRow}>
                 <View style={styles.labelCol}>
-                  <Ionicons name="time-outline" size={12} color={THEME.accentDark} style={{ marginRight: 4 }} />
+                  <Ionicons name="time-outline" size={15} color={THEME.primary} style={{ marginRight: 6 }} />
                   <Text style={styles.label}>{cfg.status.label}:</Text>
                 </View>
                 <Text style={styles.value}>{book.status}</Text>
@@ -175,7 +175,7 @@ export const DetailScreen: React.FC = () => {
               {book.rating !== undefined ? (
                 <View style={styles.detailRow}>
                   <View style={styles.labelCol}>
-                    <Ionicons name="star" size={12} color={THEME.accent} style={{ marginRight: 4 }} />
+                    <Ionicons name="star" size={15} color={THEME.accent} style={{ marginRight: 6 }} />
                     <Text style={styles.label}>Rating:</Text>
                   </View>
                   <View style={styles.ratingValueRow}>
@@ -183,7 +183,7 @@ export const DetailScreen: React.FC = () => {
                       <Ionicons
                         key={i}
                         name={i < (book.rating || 0) ? 'star' : 'star-outline'}
-                        size={12}
+                        size={15}
                         color={i < (book.rating || 0) ? THEME.accent : THEME.borderStrong}
                       />
                     ))}
@@ -194,16 +194,16 @@ export const DetailScreen: React.FC = () => {
 
               <View style={styles.detailRow}>
                 <View style={styles.labelCol}>
-                  <Ionicons name="star" size={12} color={THEME.accent} style={{ marginRight: 4 }} />
+                  <Ionicons name="star" size={15} color={THEME.accent} style={{ marginRight: 6 }} />
                   <Text style={styles.label}>Favorite:</Text>
                 </View>
-                <Text style={styles.value}>{book.favorite ? 'Yes' : 'No'}</Text>
+                <Text style={styles.value}>{book.favorite ? 'Yes ⭐' : 'No'}</Text>
               </View>
 
               {book.notes ? (
                 <View style={styles.notesSection}>
                   <View style={styles.labelCol}>
-                    <Ionicons name="document-text-outline" size={12} color={THEME.accentDark} style={{ marginRight: 4 }} />
+                    <Ionicons name="document-text-outline" size={15} color={THEME.primary} style={{ marginRight: 6 }} />
                     <Text style={styles.notesLabel}>Notes:</Text>
                   </View>
                   <Text style={styles.notesText}>{book.notes}</Text>
@@ -216,16 +216,16 @@ export const DetailScreen: React.FC = () => {
                 title={`Edit`}
                 onPress={() => setIsEditing(true)}
                 variant="primary"
-                size="sm"
-                icon={<Ionicons name="create-outline" size={14} color={THEME.accent} />}
+                size="md"
+                icon={<Ionicons name="create-outline" size={18} color="#FFFFFF" />}
                 style={styles.actionBtn}
               />
               <Button
                 title={`Delete`}
                 onPress={handleDelete}
                 variant="danger"
-                size="sm"
-                icon={<Ionicons name="trash-outline" size={14} color={THEME.textInverse} />}
+                size="md"
+                icon={<Ionicons name="trash-outline" size={18} color="#FFFFFF" />}
                 style={styles.actionBtn}
               />
             </View>
@@ -245,8 +245,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 12,
-    paddingVertical: 10,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
     backgroundColor: THEME.card,
     borderBottomWidth: 1,
     borderBottomColor: THEME.border,
@@ -254,27 +254,27 @@ const styles = StyleSheet.create({
   backBtn: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
+    gap: 6,
   },
   backBtnText: {
-    fontSize: 13,
+    fontSize: 15,
     fontWeight: '700',
     color: THEME.primary,
   },
   headerTitle: {
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: '800',
-    color: THEME.primary,
+    color: THEME.textPrimary,
   },
   container: {
-    padding: 12,
-    paddingBottom: 32,
+    padding: 16,
+    paddingBottom: 40,
   },
   mainCard: {
-    padding: 14,
-    borderColor: THEME.border,
-    borderLeftWidth: 3,
-    borderLeftColor: THEME.accent,
+    padding: 18,
+    borderRadius: 12,
+    borderLeftWidth: 4,
+    borderLeftColor: THEME.primary,
   },
   titleRow: {
     flexDirection: 'row',
@@ -282,24 +282,25 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
   },
   title: {
-    fontSize: 18,
-    fontWeight: '800',
-    color: THEME.primary,
-    letterSpacing: -0.2,
+    fontSize: 22,
+    fontWeight: '900',
+    color: THEME.textPrimary,
+    letterSpacing: -0.3,
   },
   directorRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 3,
+    marginTop: 4,
   },
   author: {
-    fontSize: 12,
+    fontSize: 14,
     color: THEME.textSecondary,
+    fontWeight: '500',
   },
   rightActionRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: 10,
   },
   starBtn: {
     padding: 2,
@@ -307,13 +308,13 @@ const styles = StyleSheet.create({
   divider: {
     height: 1,
     backgroundColor: THEME.surfaceSubtle,
-    marginVertical: 12,
+    marginVertical: 14,
   },
   detailRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: 6,
+    paddingVertical: 8,
     borderBottomWidth: 1,
     borderBottomColor: THEME.surfaceSubtle,
   },
@@ -322,51 +323,51 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   label: {
-    fontSize: 12,
+    fontSize: 14,
     fontWeight: '600',
     color: THEME.textSecondary,
   },
   value: {
-    fontSize: 12,
-    color: THEME.primary,
-    fontWeight: '600',
+    fontSize: 14,
+    color: THEME.textPrimary,
+    fontWeight: '700',
   },
   ratingValueRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 2,
+    gap: 3,
   },
   ratingNumber: {
-    fontSize: 12,
+    fontSize: 13,
     color: THEME.accentDark,
-    fontWeight: '700',
+    fontWeight: '800',
   },
   notesSection: {
-    marginTop: 10,
-    paddingTop: 8,
+    marginTop: 12,
+    paddingTop: 10,
     borderTopWidth: 1,
     borderTopColor: THEME.surfaceSubtle,
   },
   notesLabel: {
-    fontSize: 12,
-    fontWeight: '600',
+    fontSize: 14,
+    fontWeight: '700',
     color: THEME.textSecondary,
   },
   notesText: {
-    fontSize: 12,
-    color: THEME.primaryLight,
-    lineHeight: 18,
-    marginTop: 4,
+    fontSize: 13,
+    color: THEME.textPrimary,
+    lineHeight: 20,
+    marginTop: 6,
     backgroundColor: THEME.surfaceSubtle,
-    padding: 8,
-    borderRadius: 6,
+    padding: 10,
+    borderRadius: 8,
     borderWidth: 1,
     borderColor: THEME.border,
   },
   actionRow: {
     flexDirection: 'row',
-    gap: 10,
-    marginTop: 12,
+    gap: 12,
+    marginTop: 14,
   },
   actionBtn: {
     flex: 1,
@@ -375,10 +376,11 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    padding: 24,
+    padding: 32,
   },
   notFoundText: {
-    fontSize: 13,
+    fontSize: 15,
     color: THEME.textSecondary,
+    fontWeight: '500',
   },
 });

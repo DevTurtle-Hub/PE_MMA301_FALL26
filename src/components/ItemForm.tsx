@@ -130,8 +130,8 @@ export const ItemForm: React.FC<ItemFormProps> = ({
         <View style={styles.iconBox}>
           <Ionicons
             name={isEdit ? 'create' : 'film'}
-            size={14}
-            color={THEME.accent}
+            size={18}
+            color="#FFFFFF"
           />
         </View>
         <Text style={styles.formHeaderTitle}>
@@ -146,7 +146,7 @@ export const ItemForm: React.FC<ItemFormProps> = ({
           accessibilityLabel={cfg.formSuccessTestId}
           style={styles.successBox}
         >
-          <Ionicons name="checkmark-circle" size={15} color={THEME.accentDark} style={{ marginRight: 6 }} />
+          <Ionicons name="checkmark-circle" size={18} color={THEME.success} style={{ marginRight: 8 }} />
           <Text style={styles.successText}>{successMessage}</Text>
         </View>
       ) : null}
@@ -158,7 +158,7 @@ export const ItemForm: React.FC<ItemFormProps> = ({
           accessibilityLabel={cfg.errorFormTestId}
           style={styles.errorBox}
         >
-          <Ionicons name="alert-circle" size={15} color={THEME.danger} style={{ marginRight: 6 }} />
+          <Ionicons name="alert-circle" size={18} color={THEME.danger} style={{ marginRight: 8 }} />
           <Text style={styles.errorText}>{formError}</Text>
         </View>
       ) : null}
@@ -178,7 +178,7 @@ export const ItemForm: React.FC<ItemFormProps> = ({
         error={error1}
         showError={submitted}
         maxLength={cfg.field1.maxLength + 10}
-        leftIcon={<Ionicons name="film-outline" size={14} color={THEME.accentDark} />}
+        leftIcon={<Ionicons name="film-outline" size={16} color={THEME.primary} />}
       />
 
       {/* Field 2: Director */}
@@ -196,7 +196,7 @@ export const ItemForm: React.FC<ItemFormProps> = ({
         error={error2}
         showError={submitted}
         maxLength={cfg.field2.maxLength + 10}
-        leftIcon={<Ionicons name="person-outline" size={14} color={THEME.accentDark} />}
+        leftIcon={<Ionicons name="person-outline" size={16} color={THEME.primary} />}
       />
 
       {/* Category / Genre Picker */}
@@ -208,7 +208,7 @@ export const ItemForm: React.FC<ItemFormProps> = ({
             return (
               <TouchableOpacity
                 key={g}
-                activeOpacity={0.7}
+                activeOpacity={0.75}
                 style={[
                   styles.optionChip,
                   isSelected && styles.optionChipSelected,
@@ -245,7 +245,7 @@ export const ItemForm: React.FC<ItemFormProps> = ({
             return (
               <TouchableOpacity
                 key={s}
-                activeOpacity={0.7}
+                activeOpacity={0.75}
                 style={[
                   styles.optionChip,
                   isSelected && styles.optionChipSelected,
@@ -273,11 +273,11 @@ export const ItemForm: React.FC<ItemFormProps> = ({
         {submitted && statError ? <Text style={styles.inlineError}>{statError}</Text> : null}
       </View>
 
-      {/* Rating (1-5) */}
+      {/* Rating (0-5) */}
       {cfg.numeric ? (
         <Input
           label={cfg.numeric.label}
-          placeholder={`e.g. 1 to ${cfg.numeric.max}`}
+          placeholder={`e.g. 0 to ${cfg.numeric.max}`}
           keyboardType="numeric"
           value={rating}
           onChangeText={(val) => {
@@ -287,7 +287,7 @@ export const ItemForm: React.FC<ItemFormProps> = ({
           }}
           error={numError}
           showError={submitted}
-          leftIcon={<Ionicons name="star" size={14} color={THEME.accent} />}
+          leftIcon={<Ionicons name="star" size={16} color={THEME.accent} />}
         />
       ) : null}
 
@@ -300,7 +300,7 @@ export const ItemForm: React.FC<ItemFormProps> = ({
             placeholder="Movie thoughts, review, or watchlist notes..."
             placeholderTextColor={THEME.textMuted}
             multiline
-            numberOfLines={2}
+            numberOfLines={3}
             value={notes}
             onChangeText={(val) => {
               setNotes(val);
@@ -328,7 +328,7 @@ export const ItemForm: React.FC<ItemFormProps> = ({
             title="Cancel"
             onPress={onCancel}
             variant="outline"
-            size="sm"
+            size="md"
             style={styles.cancelBtn}
             disabled={submitting}
           />
@@ -338,8 +338,8 @@ export const ItemForm: React.FC<ItemFormProps> = ({
           onPress={handleSubmit}
           loading={submitting}
           variant="primary"
-          size="sm"
-          icon={<Ionicons name="checkmark" size={14} color={THEME.accent} />}
+          size="md"
+          icon={<Ionicons name="checkmark" size={16} color="#FFFFFF" />}
           style={styles.submitBtn}
         />
       </View>
@@ -352,44 +352,49 @@ export const BookForm = ItemForm;
 
 const styles = StyleSheet.create({
   card: {
-    padding: 12,
-    marginBottom: 12,
-    borderColor: THEME.border,
+    padding: 16,
+    marginBottom: 16,
+    borderRadius: 12,
   },
   cardHeaderRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 10,
+    marginBottom: 14,
   },
   iconBox: {
-    width: 22,
-    height: 22,
-    borderRadius: 4,
+    width: 32,
+    height: 32,
+    borderRadius: 8,
     backgroundColor: THEME.primary,
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: 6,
+    marginRight: 10,
+    shadowColor: THEME.primary,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3,
+    elevation: 2,
   },
   formHeaderTitle: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: THEME.primary,
+    fontSize: 16,
+    fontWeight: '800',
+    color: THEME.textPrimary,
   },
   successBox: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: THEME.accentLight,
-    borderColor: THEME.accent,
+    backgroundColor: THEME.successBg,
+    borderColor: THEME.successBorder,
     borderWidth: 1,
-    paddingVertical: 7,
-    paddingHorizontal: 10,
-    borderRadius: 6,
-    marginBottom: 10,
+    paddingVertical: 10,
+    paddingHorizontal: 14,
+    borderRadius: 8,
+    marginBottom: 14,
   },
   successText: {
-    color: THEME.accentText,
+    color: THEME.success,
     fontWeight: '700',
-    fontSize: 12,
+    fontSize: 14,
   },
   errorBox: {
     flexDirection: 'row',
@@ -397,72 +402,73 @@ const styles = StyleSheet.create({
     backgroundColor: THEME.dangerBg,
     borderColor: THEME.dangerBorder,
     borderWidth: 1,
-    paddingVertical: 7,
-    paddingHorizontal: 10,
-    borderRadius: 6,
-    marginBottom: 10,
+    paddingVertical: 10,
+    paddingHorizontal: 14,
+    borderRadius: 8,
+    marginBottom: 14,
   },
   errorText: {
     color: THEME.danger,
-    fontWeight: '600',
-    fontSize: 12,
+    fontWeight: '700',
+    fontSize: 13,
   },
   fieldContainer: {
-    marginBottom: 10,
+    marginBottom: 14,
   },
   label: {
-    fontSize: 12,
-    fontWeight: '600',
+    fontSize: 13,
+    fontWeight: '700',
     color: THEME.textPrimary,
-    marginBottom: 4,
+    marginBottom: 6,
   },
   optionsRow: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 5,
+    gap: 7,
   },
   optionChip: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 5,
-    borderWidth: 1,
+    paddingHorizontal: 12,
+    paddingVertical: 7,
+    borderRadius: 8,
+    borderWidth: 1.2,
     borderColor: THEME.borderStrong,
     backgroundColor: THEME.card,
   },
   optionChipSelected: {
     backgroundColor: THEME.primary,
-    borderColor: THEME.accent,
+    borderColor: THEME.primaryDark,
   },
   optionChipEmpty: {
     borderStyle: 'dashed',
   },
   optionText: {
-    fontSize: 11,
+    fontSize: 13,
     color: THEME.textSecondary,
-    fontWeight: '500',
+    fontWeight: '600',
   },
   optionTextSelected: {
-    color: THEME.accent,
+    color: '#FFFFFF',
     fontWeight: '700',
   },
   optionTextEmpty: {
     color: THEME.textMuted,
   },
   inlineError: {
-    fontSize: 11,
+    fontSize: 12,
     color: THEME.danger,
-    marginTop: 3,
+    marginTop: 4,
+    fontWeight: '600',
   },
   textArea: {
-    borderWidth: 1,
+    borderWidth: 1.2,
     borderColor: THEME.borderStrong,
-    borderRadius: 6,
+    borderRadius: 8,
     backgroundColor: THEME.card,
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    fontSize: 13,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    fontSize: 14,
     color: THEME.textPrimary,
-    minHeight: 52,
+    minHeight: 64,
     textAlignVertical: 'top',
   },
   textAreaError: {
@@ -472,22 +478,22 @@ const styles = StyleSheet.create({
   notesFooter: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginTop: 2,
+    marginTop: 4,
   },
   charCount: {
-    fontSize: 10,
+    fontSize: 11,
     color: THEME.textMuted,
   },
   buttonRow: {
     flexDirection: 'row',
     justifyContent: 'flex-end',
-    gap: 8,
-    marginTop: 4,
+    gap: 10,
+    marginTop: 8,
   },
   cancelBtn: {
-    minWidth: 80,
+    minWidth: 90,
   },
   submitBtn: {
-    minWidth: 100,
+    minWidth: 120,
   },
 });

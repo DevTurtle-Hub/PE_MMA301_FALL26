@@ -39,14 +39,14 @@ export const Button: React.FC<ButtonProps> = ({
   const isActionDisabled = disabled || loading;
 
   const getLoaderColor = () => {
-    if (variant === 'accent') return THEME.primary;
     if (variant === 'outline' || variant === 'ghost') return THEME.primary;
+    if (variant === 'accent') return THEME.textInverse;
     return THEME.textInverse;
   };
 
   return (
     <TouchableOpacity
-      activeOpacity={0.75}
+      activeOpacity={0.8}
       style={[
         styles.base,
         size === 'sm' ? styles.sizeSm : styles.sizeMd,
@@ -80,17 +80,17 @@ export const Button: React.FC<ButtonProps> = ({
 
 const styles = StyleSheet.create({
   base: {
-    borderRadius: 6,
+    borderRadius: 10,
     alignItems: 'center',
     justifyContent: 'center',
   },
   sizeSm: {
-    paddingVertical: 6,
-    paddingHorizontal: 10,
+    paddingVertical: 8,
+    paddingHorizontal: 14,
   },
   sizeMd: {
-    paddingVertical: 9,
-    paddingHorizontal: 14,
+    paddingVertical: 12,
+    paddingHorizontal: 18,
   },
   contentRow: {
     flexDirection: 'row',
@@ -98,24 +98,34 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   iconContainer: {
-    marginRight: 6,
+    marginRight: 8,
   },
-  // Color 1: Midnight Slate
+  // Color 1: Royal Blue
   primary: {
     backgroundColor: THEME.primary,
     borderWidth: 1,
-    borderColor: THEME.primary,
+    borderColor: THEME.primaryDark,
+    shadowColor: THEME.primary,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 3,
   },
-  // Color 2: Cinematic Amber Gold
+  // Color 2: Sky Blue
+  secondary: {
+    backgroundColor: THEME.secondary,
+    borderWidth: 1,
+    borderColor: THEME.secondaryDark,
+  },
   accent: {
     backgroundColor: THEME.accent,
     borderWidth: 1,
     borderColor: THEME.accentDark,
-  },
-  secondary: {
-    backgroundColor: THEME.primaryLight,
-    borderWidth: 1,
-    borderColor: THEME.primaryLight,
+    shadowColor: THEME.accent,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 3,
+    elevation: 2,
   },
   danger: {
     backgroundColor: THEME.danger,
@@ -124,7 +134,7 @@ const styles = StyleSheet.create({
   },
   outline: {
     backgroundColor: 'transparent',
-    borderWidth: 1.2,
+    borderWidth: 1.5,
     borderColor: THEME.primary,
   },
   ghost: {
@@ -132,23 +142,25 @@ const styles = StyleSheet.create({
     borderWidth: 0,
   },
   disabled: {
-    opacity: 0.45,
+    opacity: 0.5,
+    elevation: 0,
+    shadowOpacity: 0,
   },
   baseText: {
-    fontSize: 13,
+    fontSize: 15,
     fontWeight: '700',
-    letterSpacing: 0.2,
+    letterSpacing: 0.3,
   },
   textSm: {
-    fontSize: 12,
+    fontSize: 13,
   },
   primaryText: {
     color: THEME.textInverse,
   },
-  accentText: {
-    color: THEME.primary,
-  },
   secondaryText: {
+    color: THEME.textInverse,
+  },
+  accentText: {
     color: THEME.textInverse,
   },
   dangerText: {
