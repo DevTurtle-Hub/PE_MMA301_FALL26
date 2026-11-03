@@ -5,8 +5,7 @@ import { RootStackParamList } from './types';
 import { useAuth } from '../context/AuthContext';
 import { BookProvider } from '../context/BookContext';
 
-// Screens
-import { HomeScreen } from '../screens/HomeScreen';
+// Screens (Login, Register, List, Detail)
 import { LoginScreen } from '../screens/LoginScreen';
 import { RegisterScreen } from '../screens/RegisterScreen';
 import { ListScreen } from '../screens/ListScreen';
@@ -19,8 +18,7 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 export const AppNavigator: React.FC = () => {
   const { user, loading } = useAuth();
 
-  // Requirement: "Đã đăng nhập -> Chuyển thẳng vào màn hình List (không được chớp/flash màn hình Home)"
-  // While Firebase is restoring auth state from AsyncStorage, show loading indicator.
+  // Requirement: "Đã đăng nhập -> Chuyển thẳng vào màn hình List (không được chớp/flash)"
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
@@ -29,7 +27,7 @@ export const AppNavigator: React.FC = () => {
     );
   }
 
-  // Requirement: "Chưa đăng nhập -> Vào màn hình Home"
+  // Requirement: Chưa đăng nhập -> Vào thẳng màn hình Sign In / Login (theo đúng chuẩn các màn hình đề thi)
   if (user == null) {
     return (
       <Stack.Navigator
@@ -37,23 +35,15 @@ export const AppNavigator: React.FC = () => {
           headerShown: false,
           animation: 'fade',
         }}
+        initialRouteName="Login"
       >
-        <Stack.Screen name="Home" component={HomeScreen} />
-        <Stack.Screen
-          name="Login"
-          component={LoginScreen}
-          options={{ headerShown: true, title: 'Sign In' }}
-        />
-        <Stack.Screen
-          name="Register"
-          component={RegisterScreen}
-          options={{ headerShown: true, title: 'Sign Up' }}
-        />
+        <Stack.Screen name="Login" component={LoginScreen} />
+        <Stack.Screen name="Register" component={RegisterScreen} />
       </Stack.Navigator>
     );
   }
 
-  // Requirement: "Đã đăng nhập -> Chuyển thẳng vào màn hình List", "Bấm vào 1 sách -> Chuyển sang màn hình Detail"
+  // Đã đăng nhập -> Chuyển thẳng vào màn hình List
   return (
     <BookProvider>
       <Stack.Navigator

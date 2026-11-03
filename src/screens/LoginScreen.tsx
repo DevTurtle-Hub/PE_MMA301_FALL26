@@ -78,17 +78,6 @@ export const LoginScreen: React.FC = () => {
         style={{ flex: 1 }}
       >
         <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
-          <View style={styles.topNavRow}>
-            <TouchableOpacity
-              onPress={() => navigation.navigate('Home')}
-              style={styles.backBtn}
-              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-            >
-              <Ionicons name="arrow-back" size={18} color={THEME.primary} />
-              <Text style={styles.backBtnText}>Home</Text>
-            </TouchableOpacity>
-          </View>
-
           <Card style={styles.card}>
             <View style={styles.headerBox}>
               <View style={styles.logoBadge}>

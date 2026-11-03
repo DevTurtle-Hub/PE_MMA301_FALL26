@@ -226,38 +226,12 @@ def create_comprehensive_report(student_code="QE190042", full_name="Nguyen Van Q
         "They enforce authentication checks, data validation on both create and update operations, and ownership isolation:"
     ).font.size = Pt(10)
 
-    rules_code = (
-        "rules_version = '2';\n"
-        "service cloud.firestore {\n"
-        "  match /databases/{database}/documents {\n"
-        "    match /movies/{movieId} {\n"
-        "      function isValidMovie() {\n"
-        "        return request.resource.data.userId == request.auth.uid\n"
-        "          && request.resource.data.title is string \n"
-        "          && request.resource.data.title.trim().size() > 0 \n"
-        "          && request.resource.data.title.size() <= 100\n"
-        "          && request.resource.data.director is string \n"
-        "          && request.resource.data.director.trim().size() > 0 \n"
-        "          && request.resource.data.director.size() <= 60\n"
-        "          && request.resource.data.genre in ['Action', 'Comedy', 'Drama', 'Horror']\n"
-        "          && request.resource.data.status in ['Plan to Watch', 'Watching', 'Watched']\n"
-        "          && (!('rating' in request.resource.data) || (request.resource.data.rating is int && request.resource.data.rating >= 0 && request.resource.data.rating <= 5))\n"
-        "          && (!('favorite' in request.resource.data) || request.resource.data.favorite is bool)\n"
-        "          && (!('notes' in request.resource.data) || (request.resource.data.notes is string && request.resource.data.notes.size() <= 300));\n"
-        "      }\n\n"
-        "      // 1. Read & Delete restricted strictly to document owner\n"
-        "      allow read, delete: if request.auth != null && resource.data.userId == request.auth.uid;\n"
-        "      \n"
-        "      // 2. Create validated against schema and caller ownership\n"
-        "      allow create: if request.auth != null && isValidMovie();\n\n"
-        "      // 3. Update validated and protected from identity tampering\n"
-        "      allow update: if request.auth != null \n"
-        "        && resource.data.userId == request.auth.uid \n"
-        "        && isValidMovie();\n"
-        "    }\n"
-        "  }\n"
-        "}"
-    )
+    firestore_rules_path = os.path.join(os.path.dirname(__file__), "..", "firestore.rules")
+    if os.path.exists(firestore_rules_path):
+        with open(firestore_rules_path, "r", encoding="utf-8") as rf:
+            rules_code = rf.read()
+    else:
+        rules_code = "rules_version = '2';\nservice cloud.firestore { ... }"
 
     t_code = doc.add_table(rows=1, cols=1)
     t_code.alignment = WD_TABLE_ALIGNMENT.CENTER
