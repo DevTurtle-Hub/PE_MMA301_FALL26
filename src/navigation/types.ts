@@ -2,7 +2,8 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RouteProp } from '@react-navigation/native';
 
 export type RootStackParamList = {
-  // Auth flow (Standard exam screens)
+  // Auth flow (Section 2.3: Home, Login, Register)
+  Home: undefined;
   Login: undefined;
   Register: undefined;
 

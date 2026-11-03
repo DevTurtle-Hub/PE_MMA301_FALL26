@@ -5,7 +5,8 @@ import { RootStackParamList } from './types';
 import { useAuth } from '../context/AuthContext';
 import { BookProvider } from '../context/BookContext';
 
-// Screens (Login, Register, List, Detail)
+// Screens (Home, Login, Register, List, Detail)
+import { HomeScreen } from '../screens/HomeScreen';
 import { LoginScreen } from '../screens/LoginScreen';
 import { RegisterScreen } from '../screens/RegisterScreen';
 import { ListScreen } from '../screens/ListScreen';
@@ -18,7 +19,7 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 export const AppNavigator: React.FC = () => {
   const { user, loading } = useAuth();
 
-  // Requirement: "Đã đăng nhập -> Chuyển thẳng vào màn hình List (không được chớp/flash)"
+  // Requirement: "Đã đăng nhập -> Chuyển thẳng vào màn hình List (không được chớp/flash màn hình Home)"
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
@@ -27,7 +28,7 @@ export const AppNavigator: React.FC = () => {
     );
   }
 
-  // Requirement: Chưa đăng nhập -> Vào thẳng màn hình Sign In / Login (theo đúng chuẩn các màn hình đề thi)
+  // Requirement: "Logged out, the app opens on the Home screen; after logging in you land on the List screen"
   if (user == null) {
     return (
       <Stack.Navigator
@@ -35,8 +36,9 @@ export const AppNavigator: React.FC = () => {
           headerShown: false,
           animation: 'fade',
         }}
-        initialRouteName="Login"
+        initialRouteName="Home"
       >
+        <Stack.Screen name="Home" component={HomeScreen} />
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="Register" component={RegisterScreen} />
       </Stack.Navigator>

@@ -67,6 +67,7 @@ def create_comprehensive_report(student_code="QE190042", full_name="Nguyen Van Q
         ("Full Name", full_name),
         ("GitHub Repository URL", "https://github.com/DevTurtle-Hub/PE_MMA301_FALL26"),
         ("Expo Project Link", "https://expo.dev/accounts/quynv64/projects/pe_mma301_fall26"),
+        ("APK Download / Build URL", "https://expo.dev/accounts/quynv64/projects/pe_mma301_fall26"),
         ("Firebase Project ID", "pemma301fall26"),
         ("Test account email", f"grader.{student_code.lower()}@example.com"),
         ("Test account password", "Test1234!"),
@@ -105,7 +106,49 @@ def create_comprehensive_report(student_code="QE190042", full_name="Nguyen Van Q
             r1.font.color.rgb = PRIMARY_COLOR
 
     p_sp1 = doc.add_paragraph()
-    p_sp1.paragraph_format.space_after = Pt(12)
+    p_sp1.paragraph_format.space_after = Pt(8)
+
+    # -------------------------------------------------------------
+    # SECTION 1.1: QR CODE FOR MOBILE DEPLOYMENT / APK DOWNLOAD
+    # -------------------------------------------------------------
+    doc.add_heading("1.1 Mobile Deployment & Scan-to-Install QR Code", level=2)
+    p_qr_intro = doc.add_paragraph()
+    p_qr_intro.add_run(
+        "Grader can scan the QR code below using any mobile camera or barcode scanner to download the Android APK build "
+        "or open the deployed CineList project on a physical device:"
+    ).font.size = Pt(10)
+
+    screenshots_dir = os.path.join(os.path.dirname(__file__), "..", "screenshots")
+    if not os.path.exists(screenshots_dir):
+        os.makedirs(screenshots_dir)
+
+    qr_path = os.path.join(screenshots_dir, "apk_qr.png")
+    if not os.path.exists(qr_path):
+        try:
+            import urllib.request
+            project_link = "https://expo.dev/accounts/quynv64/projects/pe_mma301_fall26"
+            api_url = f"https://api.qrserver.com/v1/create-qr-code/?size=350x350&data={project_link}"
+            urllib.request.urlretrieve(api_url, qr_path)
+        except Exception as e:
+            print(f"[WARN] Could not download QR code automatically: {e}")
+
+    if os.path.exists(qr_path):
+        p_qr_img = doc.add_paragraph()
+        p_qr_img.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        p_qr_img.paragraph_format.space_before = Pt(6)
+        p_qr_img.paragraph_format.space_after = Pt(4)
+        run_qr = p_qr_img.add_run()
+        run_qr.add_picture(qr_path, width=Inches(2.4))
+
+        p_qr_caption = doc.add_paragraph()
+        p_qr_caption.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        r_qrc = p_qr_caption.add_run("Figure 1.1: Scan QR code to install APK / access deployed CineList project")
+        r_qrc.font.size = Pt(9)
+        r_qrc.font.italic = True
+        r_qrc.font.color.rgb = MUTED_GRAY
+
+    p_sp_qr = doc.add_paragraph()
+    p_sp_qr.paragraph_format.space_after = Pt(12)
 
     # -------------------------------------------------------------
     # SECTION 2: ARCHITECTURE & DESIGN OVERVIEW
