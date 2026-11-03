@@ -54,6 +54,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setError(null);
     try {
       await createUserWithEmailAndPassword(auth, email.trim(), pass);
+      // Immediately sign out so RegisterScreen stays mounted and shows 'Registration successful' banner
+      // Login is then performed via the Login screen as required by the exam.
+      await firebaseSignOut(auth);
     } catch (err: any) {
       const msg = err.message || 'Failed to register';
       setError(msg);
