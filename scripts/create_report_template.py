@@ -154,8 +154,14 @@ def create_report(student_code="QE190042", full_name="Nguyen Van Quy", output_fi
             r_ph.font.bold = True
             p_placeholder.alignment = WD_ALIGN_PARAGRAPH.CENTER
 
-    doc.save(output_filename)
-    print(f"Report document successfully created at: {output_filename}")
+    try:
+        doc.save(output_filename)
+        print(f"Report document successfully created at: {output_filename}")
+    except PermissionError:
+        print(f"[NOTE] '{output_filename}' is currently opened in Microsoft Word. Please close Word to overwrite it with new changes.")
+        temp_name = f"temp_{output_filename}"
+        doc.save(temp_name)
+        print(f"Saved update to fallback: {temp_name}")
 
 if __name__ == "__main__":
     create_report("QE190042", "Nguyen Van Quy")

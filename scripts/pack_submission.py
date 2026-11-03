@@ -46,7 +46,7 @@ def pack_submission(student_code="QE190042"):
             dirs[:] = [d for d in dirs if d not in exclude_dirs]
             
             for file in files:
-                if file in exclude_files:
+                if file in exclude_files or file.startswith("~$"):
                     continue
                 if file.endswith('.tsbuildinfo'):
                     continue

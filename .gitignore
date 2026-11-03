@@ -34,6 +34,7 @@ yarn-error.*
 # Submission builds
 QE190042/
 *.zip
+~$*.docx
 .env
 .env*.local
 .env.local
