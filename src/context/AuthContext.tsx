@@ -1,12 +1,14 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
+import { initializeApp, getApps } from 'firebase/app';
 import { 
   User, 
   signInWithEmailAndPassword, 
   createUserWithEmailAndPassword, 
   signOut as firebaseSignOut, 
-  onAuthStateChanged 
+  onAuthStateChanged,
+  getAuth 
 } from 'firebase/auth';
-import { auth } from '../config/firebaseConfig';
+import { auth, firebaseConfig } from '../config/firebaseConfig';
 
 interface AuthContextType {
   user: User | null;
@@ -22,6 +24,15 @@ interface AuthContextType {
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+// Helper to get an isolated secondary auth instance so creating accounts
+// does not automatically sign in and eject the user from RegisterScreen.
+const getSecondaryAuth = () => {
+  const secondaryAppName = 'SecondaryAuthApp';
+  const existingApp = getApps().find((a) => a.name === secondaryAppName);
+  const secondaryApp = existingApp || initializeApp(firebaseConfig, secondaryAppName);
+  return getAuth(secondaryApp);
+};
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
@@ -53,10 +64,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const register = async (email: string, pass: string) => {
     setError(null);
     try {
-      await createUserWithEmailAndPassword(auth, email.trim(), pass);
-      // Immediately sign out so RegisterScreen stays mounted and shows 'Registration successful' banner
-      // Login is then performed via the Login screen as required by the exam.
-      await firebaseSignOut(auth);
+      // Create real account in Firebase using secondary auth so primary session doesn't auto-redirect
+      const secondaryAuth = getSecondaryAuth();
+      await createUserWithEmailAndPassword(secondaryAuth, email.trim(), pass);
+      await firebaseSignOut(secondaryAuth);
     } catch (err: any) {
       const msg = err.message || 'Failed to register';
       setError(msg);
