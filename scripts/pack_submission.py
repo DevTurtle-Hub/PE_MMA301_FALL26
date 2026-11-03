@@ -7,15 +7,23 @@ def pack_submission(student_code="QE190042"):
     dist_folder = os.path.join(root_dir, student_code)
     
     if os.path.exists(dist_folder):
-        shutil.rmtree(dist_folder)
-    os.makedirs(dist_folder)
+        try:
+            shutil.rmtree(dist_folder)
+            os.makedirs(dist_folder)
+        except PermissionError:
+            pass
+    else:
+        os.makedirs(dist_folder)
 
     # 1. Copy Word document
     docx_file = f"{student_code}.docx"
     docx_path = os.path.join(root_dir, docx_file)
     if os.path.exists(docx_path):
-        shutil.copy(docx_path, os.path.join(dist_folder, docx_file))
-        print(f"Copied {docx_file} into {dist_folder}")
+        try:
+            shutil.copy(docx_path, os.path.join(dist_folder, docx_file))
+            print(f"Copied {docx_file} into {dist_folder}")
+        except PermissionError:
+            print(f"[NOTE] {docx_file} is locked by Word; keeping current copy.")
     else:
         print(f"Warning: {docx_file} not found at project root!")
 

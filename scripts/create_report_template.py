@@ -539,8 +539,12 @@ def create_comprehensive_report(student_code="QE190042", full_name="Nguyen Van Q
         "5. Sign in with the provided test account (`grader.qe190042@example.com` / `Test1234!`) to evaluate all features."
     ).font.size = Pt(10)
 
-    doc.save(output_filename)
-    print(f"Comprehensive report successfully generated at: {output_filename}")
+    try:
+        doc.save(output_filename)
+        print(f"Comprehensive report successfully generated at: {output_filename}")
+    except PermissionError:
+        print(f"[NOTE] '{output_filename}' is currently opened in Microsoft Word. Saved to 'temp_{output_filename}'")
+        doc.save(f"temp_{output_filename}")
 
 if __name__ == "__main__":
     create_comprehensive_report("QE190042", "Nguyen Van Quy", "QE190042.docx")
